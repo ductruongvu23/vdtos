@@ -60,8 +60,8 @@ Chạy `git init`, ghi phần thiết kế ở file này vào `docs/superpowers/
   CONFIG_LRU_GEN_ENABLED=y
   CONFIG_DEBUG_INFO_NONE=y
   # CONFIG_DEBUG_INFO_DWARF5 is not set
-  # CONFIG_DEBUG_INFO_BTF is not set
   ```
+  Không ghi dòng `# CONFIG_DEBUG_INFO_BTF is not set`: BTF phụ thuộc DEBUG_INFO, khi DEBUG_INFO_NONE thì dòng đó không xuất hiện trong `.config` nên check_fragment sẽ báo thiếu.
   Preempt dùng `PREEMPT_DYNAMIC` (Debian đã bật) cộng tham số boot `preempt=full`, như vậy không phải sửa config.
   CPU để generic x86-64 nên máy mới hơn vẫn chạy được.
 - `scripts/kconfig/merge_config.sh -m .config ../../kernel/config.fragment && make olddefconfig`.
@@ -99,7 +99,7 @@ Phần chỉnh để máy nhẹ hơn (`includes.chroot`):
 - `xfwm4.xml`: `use_compositing=false`
 
 ## Task 5: Đo đạc khi test (`vdtos-report`)
-- `vdtos-report.service`: `After=graphical.target`, `ConditionKernelCommandLine=vdtos.test`. Bản phát hành không bị ảnh hưởng.
+- `vdtos-report.service`: `Type=simple` (không dùng oneshot: unit oneshot nằm trong lượt boot, chạy `is-system-running --wait` sẽ tự chờ chính nó và treo mãi, còn `systemd-analyze` sẽ báo boot chưa xong), `After=graphical.target`, `ConditionKernelCommandLine=vdtos.test`. Bản phát hành không bị ảnh hưởng.
 - `/usr/local/bin/vdtos-report`: chạy `systemctl is-system-running --wait`, sau đó ghi ra `/dev/ttyS0`
   hai dòng `VDTOS-BOOT <giây tới graphical.target từ systemd-analyze>` và `VDTOS-MEM <MB used từ free -m>`.
 - Hook `0100-enable-report.hook.chroot`: `systemctl enable vdtos-report.service`.
