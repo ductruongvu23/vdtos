@@ -20,6 +20,7 @@ check_fragment() {
 
 main() {
   local repo_root kver kdir fragment tmp pkg deb
+  local kcc="${KCC:-gcc}"
   repo_root="$PWD"
   kver="$(cat build/KVER)"
   kdir="$repo_root/build/linux-${kver}"
@@ -51,10 +52,10 @@ main() {
   cd "$kdir"
   ./scripts/config --set-str SYSTEM_TRUSTED_KEYS "" --set-str SYSTEM_REVOCATION_KEYS ""
   ./scripts/kconfig/merge_config.sh -m .config "$fragment"
-  make olddefconfig
+  make CC="$kcc" olddefconfig
   check_fragment .config "$fragment"
 
-  make -j"$(nproc)" bindeb-pkg
+  make -j"$(nproc)" CC="$kcc" bindeb-pkg
 
   mkdir -p "$repo_root/live/config/packages.chroot"
   rm -f "$repo_root/live/config/packages.chroot"/linux-image-*-vdtos*.deb
