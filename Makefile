@@ -9,7 +9,7 @@ kernel:
 
 iso:
 	mkdir -p out
-	cd live && sudo lb clean && lb config && sudo lb build 2>&1 | tee ../out/build.log
+	cd live && lb clean && lb config && lb build 2>&1 | tee ../out/build.log
 	mv live/vdtos-amd64.hybrid.iso out/
 
 test:
@@ -17,5 +17,5 @@ test:
 	bash tests/smoke.sh
 
 clean:
-	cd live && sudo lb clean
+	cd live && lb clean
 	rm -rf build out
