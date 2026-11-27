@@ -8,6 +8,7 @@ kernel:
 	bash kernel/build.sh
 
 iso:
+	@[[ "$$(id -u)" -eq 0 ]] || { echo "ERROR: make iso must run as root" >&2; exit 1; }
 	mkdir -p out
 	cd live && lb clean && lb config && lb build 2>&1 | tee ../out/build.log
 	mv live/vdtos-amd64.hybrid.iso out/
