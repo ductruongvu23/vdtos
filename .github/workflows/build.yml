@@ -5,7 +5,16 @@ on:
   push:
     branches: ['**']
     tags: ['v*']
+    # tag pushes ignore path filters, so releases always build
+    paths-ignore:
+      - 'docs/**'
+      - '**.md'
   workflow_dispatch:
+
+# a newer push to the same branch cancels the older, now-stale run
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   KERNEL_DEPS: build-essential bc bison flex libssl-dev libelf-dev dwarves rsync cpio kmod dpkg-dev debhelper fakeroot gnupg ca-certificates curl jq xz-utils python3 make
