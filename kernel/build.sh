@@ -31,7 +31,7 @@ main() {
   fi
 
   tmp="$(mktemp -d)"
-  trap 'rm -rf "$tmp"' EXIT
+  trap 'rm -rf "$tmp"' RETURN
 
   pkg="$(apt-cache pkgnames linux-image- \
     | grep -E '^linux-image-[0-9]+\.[0-9]+.*-amd64$' \
