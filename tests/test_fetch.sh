@@ -27,9 +27,9 @@ xz -z "$tmp/test.tar"
 
 verify_tarball "$tmp/test.tar.xz" "$tmp/test.tar.sign"
 
-# Tamper with the compressed tarball
-cp "$tmp/test.tar.xz" "$tmp/tampered.tar.xz"
-printf 'x' >> "$tmp/tampered.tar.xz"
+# Tamper with the inner payload and recompress, keeping the original signature
+printf 'tampered kernel tarball test payload\n' > "$tmp/tampered.tar"
+xz -z "$tmp/tampered.tar"
 assert_fails verify_tarball "$tmp/tampered.tar.xz" "$tmp/test.tar.sign"
 
 # Missing signature file
