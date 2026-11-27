@@ -4,10 +4,8 @@ Distro desktop nhẹ cho máy cũ (từ i3 gen2, 8GB RAM). Kernel longterm tự 
 
 Thiết kế: [docs/superpowers/specs/2026-11-27-vdtos-design.md](docs/superpowers/specs/2026-11-27-vdtos-design.md)
 
-## Build (trong WSL2 Debian, repo đặt ở ~/New_os, không ở /mnt/c)
+## Build
 
-```sh
-make kernel   # tải + kiểm chữ ký + build kernel .deb
-make iso      # ra out/vdtos-amd64.hybrid.iso
-make test     # boot ISO trong QEMU, kiểm RAM nhàn rỗi và thời gian boot
-```
+Không build ở máy local. Mỗi lần push, GitHub Actions ([.github/workflows/build.yml](.github/workflows/build.yml)) tự chạy
+test → build kernel → build ISO → boot thử ISO trong QEMU. ISO lấy ở artifact `iso` của lần chạy đó.
+Mỗi tag `v*` sẽ tạo một GitHub Release kèm file ISO.
