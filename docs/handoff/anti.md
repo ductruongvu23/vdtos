@@ -30,10 +30,13 @@ Claude là người điều phối. Mỗi khi bạn xong việc hoặc được 
 4. Làm trong thư mục riêng của mình (Anti: `C:\Users\VDT\Documents\New_os`, Codex: `C:\Users\VDT\Documents\New_os-codex` qua `git worktree`), không đổi branch trong thư mục của agent kia.
 
 ## Việc hiện tại
-**Cho `kernel/build.sh` dùng ccache qua biến môi trường `KCC`** (branch `anti/ccache`, tạo từ `main`).
-- Ở đầu `main`, đặt: `local kcc="${KCC:-gcc}"`.
-- Mọi lệnh `make` trong cây kernel (`olddefconfig` và `bindeb-pkg`) đều thêm `CC="$kcc"`. Ví dụ: `make -j"$(nproc)" CC="$kcc" bindeb-pkg`.
-  Phải truyền `CC` trên dòng lệnh `make`, vì Makefile kernel bỏ qua biến `CC` lấy từ môi trường.
-- Nếu không đặt `KCC` thì mọi thứ chạy y như cũ. CI sẽ đặt `KCC="ccache gcc"` (đã có trên branch `ci/ccache` của Claude).
-- Push xong là xong; job `unit` phải xanh. Không cần chờ job `kernel` trên branch của bạn.
-Sau đó: Chờ.
+**Sửa lỗi ISO thiếu kernel** (branch `anti/iso-kernel`, tạo từ `main`). Log CI run 46056716432, job `iso`:
+`ls: cannot access 'binary/live/vmlinuz-*'` → `ln: failed to access 'binary/live/vmlinuz'` → `E: An unexpected failure occurred`.
+Nguyên nhân: `--linux-packages none` làm live-build bỏ qua bước chép kernel (binary_linux-image), nên bước bootloader (syslinux) không tìm thấy `vmlinuz`. Hook `.hook.binary` chạy quá muộn nên không dùng được.
+Cách sửa: trong `live/auto/config`, cho live-build cài và chép đúng kernel của mình:
+- Lấy tên gói từ file `.deb` có trong `config/packages.chroot/`: `linux-image-6.18.65-vdtos_6.18.65-1_amd64.deb` → tên gói `linux-image-6.18.65-vdtos`.
+- Truyền `--linux-flavours vdtos --linux-packages "linux-image-6.18.65"` (live-build tự ghép thành `<packages>-<flavour>`). Phiên bản phải đọc từ tên file, không viết cứng.
+- Nếu không có file `.deb` (job `unit` chạy `lb config` khi chưa build kernel) thì dùng `--linux-packages none` và in ra cảnh báo, để `lb config` vẫn chạy được.
+- Viết test trong `tests/` cho hàm tách tên gói từ tên file `.deb`. Tách hàm này ra file riêng có thể `source` được, ví dụ `live/kernel-pkg.sh` với hàm `kernel_pkg_from_deb <file>` trả về `linux-image-6.18.65`.
+Không sửa `kernel/build.sh` trong lần này (branch `anti/ccache` của bạn đang chờ gộp riêng).
+Push xong là xong; job `unit` phải xanh. Claude sẽ gộp; job `iso`/`smoke` trên `main` sẽ kiểm tra thật (kernel đã có sẵn trong cache, nên CI không phải build lại kernel).
