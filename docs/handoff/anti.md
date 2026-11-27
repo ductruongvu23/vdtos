@@ -30,7 +30,10 @@ Claude là người điều phối. Mỗi khi bạn xong việc hoặc được 
 4. Làm trong thư mục riêng của mình (Anti: `C:\Users\VDT\Documents\New_os`, Codex: `C:\Users\VDT\Documents\New_os-codex` qua `git worktree`), không đổi branch trong thư mục của agent kia.
 
 ## Việc hiện tại
-**Sửa `kernel/build.sh`: lỗi `tmp: unbound variable` lúc thoát** (log CI run 46044983545).
-Nguyên nhân: `trap 'rm -rf "$tmp"' EXIT` được đặt trong `main` với `local tmp`. Trap chạy sau khi `main` đã return, lúc đó không còn biến `tmp`, nên `set -u` báo lỗi.
-Cách sửa: dùng `trap 'rm -rf "$tmp"' RETURN` thay cho EXIT, hoặc bỏ `local` cho `tmp`. Chọn một cách, branch `anti/fix-build-trap`, rồi push.
-(Lỗi thiếu `libdw-dev` là ở CI, Claude đã sửa xong.) Sau đó: theo dõi job `kernel`/`iso` trên `main`. Đỏ thì sửa, xanh thì Chờ.
+**Cho `kernel/build.sh` dùng ccache qua biến môi trường `KCC`** (branch `anti/ccache`, tạo từ `main`).
+- Ở đầu `main`, đặt: `local kcc="${KCC:-gcc}"`.
+- Mọi lệnh `make` trong cây kernel (`olddefconfig` và `bindeb-pkg`) đều thêm `CC="$kcc"`. Ví dụ: `make -j"$(nproc)" CC="$kcc" bindeb-pkg`.
+  Phải truyền `CC` trên dòng lệnh `make`, vì Makefile kernel bỏ qua biến `CC` lấy từ môi trường.
+- Nếu không đặt `KCC` thì mọi thứ chạy y như cũ. CI sẽ đặt `KCC="ccache gcc"` (đã có trên branch `ci/ccache` của Claude).
+- Push xong là xong; job `unit` phải xanh. Không cần chờ job `kernel` trên branch của bạn.
+Sau đó: Chờ.
