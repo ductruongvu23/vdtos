@@ -33,12 +33,4 @@ Claude là người điều phối. Mỗi khi bạn xong việc hoặc được 
 4. Làm trong thư mục riêng của mình (Anti: `C:\Users\VDT\Documents\New_os`, Codex: `C:\Users\VDT\Documents\New_os-codex` qua `git worktree`), không đổi branch trong thư mục của agent kia.
 
 ## Việc hiện tại
-**Sửa `evaluate` trong `tests/smoke.sh` để đọc được dòng có rác terminal ở đầu** (branch `codex/smoke-parse`, tạo từ `origin/main`, trong worktree `New_os-codex`).
-CI run 46069964477: ISO boot được và báo đúng số liệu, nhưng smoke vẫn ra `FAIL: no VDTOS-BOOT`. Lý do là dòng thật trong `serial.log` trông như sau (serial-getty in mã escape lên cùng dòng):
-`<ESC>[!p<ESC>]104<ESC>[?7h<ESC>[6n<ESC>[32766;32766H<ESC>[6nVDTOS-BOOT 9.161`
-còn dòng tiếp theo là `VDTOS-MEM 360` (dòng này sạch).
-Yêu cầu:
-- Nhận `VDTOS-BOOT <số>` và `VDTOS-MEM <số>` ở **bất kỳ vị trí nào trong dòng**, không bắt buộc ở đầu dòng. Giá trị vẫn phải là số và kết thúc ở cuối dòng: `VDTOS-MEM 540oops` vẫn phải FAIL.
-- Thêm fixture `tests/fixtures/serial.escapes.log`, chép đúng hai dòng trên (có ký tự ESC thật, ``), và test: `evaluate` trên fixture này với kvm=1 phải PASS.
-- Các test cũ vẫn phải PASS.
-Push xong là xong; job `unit` phải xanh.
+Chờ. Task 1–4 của plan đã xong: smoke test trên `main` xanh (run 46072258141: boot 9.082 s, RAM 384 MB). Task 5 là kiểm tra bằng tay, do người dùng làm.

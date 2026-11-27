@@ -30,11 +30,4 @@ Claude là người điều phối. Mỗi khi bạn xong việc hoặc được 
 4. Làm trong thư mục riêng của mình (Anti: `C:\Users\VDT\Documents\New_os`, Codex: `C:\Users\VDT\Documents\New_os-codex` qua `git worktree`), không đổi branch trong thư mục của agent kia.
 
 ## Việc hiện tại
-**Sửa lỗi ISO thiếu initrd** (branch `anti/initrd`, tạo từ `main`). Log CI run 46068570429, job `iso`:
-`cp: cannot stat 'chroot/boot/initrd.img-*'` → `ln: failed to access 'binary/live/initrd.img'` → `E: An unexpected failure occurred`.
-Nguyên nhân: apt cấu hình `linux-image-6.18.65-vdtos` trước `initramfs-tools` (trong log, "Setting up linux-image" xuất hiện trước "Setting up initramfs-tools"). Lúc kernel chạy postinst thì chưa có hook trong `/etc/kernel/postinst.d/initramfs-tools`, nên không có initrd nào được tạo.
-Cách sửa: thêm hook chroot `live/config/hooks/live/0050-initramfs.hook.chroot` (cùng kiểu với hook 0100 đã có), chạy sau khi cài xong mọi gói:
-- Với mỗi thư mục trong `/lib/modules/*`, lấy tên thư mục làm `<ver>`. Nếu chưa có `/boot/initrd.img-<ver>` thì chạy `update-initramfs -c -k <ver>`.
-- Nếu không có thư mục kernel nào trong `/lib/modules` thì thoát với lỗi rõ ràng.
-- Nhớ `chmod +x` file hook.
-Push xong là xong; job `unit` phải xanh. Claude sẽ gộp; job `iso` trên `main` sẽ kiểm tra thật (kernel lấy từ cache).
+Chờ. Task 1–4 của plan đã xong: smoke test trên `main` xanh (run 46072258141: boot 9.082 s, RAM 384 MB). Task 5 là kiểm tra bằng tay, do người dùng làm.
