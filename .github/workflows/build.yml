@@ -17,7 +17,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  KERNEL_DEPS: build-essential libdw-dev zstd bc bison flex libssl-dev libelf-dev dwarves rsync cpio kmod dpkg-dev debhelper fakeroot gnupg ca-certificates curl jq xz-utils python3 make
+  KERNEL_DEPS: build-essential libdw-dev zstd ccache bc bison flex libssl-dev libelf-dev dwarves rsync cpio kmod dpkg-dev debhelper fakeroot gnupg ca-certificates curl jq xz-utils python3 make
   ISO_DEPS: live-build make ca-certificates xorriso
 
 jobs:
