@@ -19,3 +19,18 @@ Bạn làm **Task 1, 2, 3** trong `docs/superpowers/plans/2026-11-27-vdtos.md`, 
 - Job `unit` trên branch `anti/kernel-live` xanh: `tests/run.sh` PASS và `lb config` chạy được.
 - Job `kernel` sẽ tự chạy sau khi phần `Makefile` của Codex được merge vào. Lúc đó nếu job đỏ thì bạn sửa.
 - Báo lại: link tới lần chạy Actions đã xanh.
+
+---
+
+## Quy trình điều phối (từ 2026-11-28)
+Claude là người điều phối. Mỗi khi bạn xong việc hoặc được nhắc "làm tiếp":
+1. `git fetch origin && git switch main && git pull --ff-only`
+2. Đọc mục **Việc hiện tại** ngay bên dưới và làm theo. Mỗi việc làm trên một branch mới tạo từ `main`, tên `<agent>/<việc>`. Push xong là xong; Claude sẽ tự review và gộp.
+3. Nếu mục đó ghi "Chờ" thì không làm gì cả.
+4. Làm trong thư mục riêng của mình (Anti: `C:\Users\VDT\Documents\New_os`, Codex: `C:\Users\VDT\Documents\New_os-codex` qua `git worktree`), không đổi branch trong thư mục của agent kia.
+
+## Việc hiện tại
+**Theo dõi job `kernel` và `iso` trên `main`** (lần chạy đầu tiên đang chạy, build kernel mất khoảng 1 giờ).
+Nếu một trong hai job đỏ: đọc log (với job `iso` thì xem artifact `build-log`), sửa trên branch `anti/fix-<tên-lỗi>`, rồi push.
+Chỗ rủi ro nhất: ISO không có `live/vmlinuz-*-vdtos`. Xem cách xử lý ở Task 4 Step 5 trong plan (hook `9000-copy-kernel.hook.binary`).
+Nếu cả hai job xanh: Chờ.

@@ -22,3 +22,18 @@ Step 5–6 (build ISO thật và chạy smoke test) sẽ tự chạy trên GitHu
 - `bash tests/test_smoke_eval.sh` PASS đủ 5 trường hợp: pass / slow (kvm 1) / slow (kvm 0, có WARN) / heavy / hang.
   Chạy ở local bằng Git Bash, hoặc xem job `unit` khi branch đã có `tests/run.sh`.
 - `make -n kernel iso` in ra các lệnh đúng như plan, không có `sudo`.
+
+---
+
+## Quy trình điều phối (từ 2026-11-28)
+Claude là người điều phối. Mỗi khi bạn xong việc hoặc được nhắc "làm tiếp":
+1. `git fetch origin && git switch main && git pull --ff-only`
+2. Đọc mục **Việc hiện tại** ngay bên dưới và làm theo. Mỗi việc làm trên một branch mới tạo từ `main`, tên `<agent>/<việc>`. Push xong là xong; Claude sẽ tự review và gộp.
+3. Nếu mục đó ghi "Chờ" thì không làm gì cả.
+4. Làm trong thư mục riêng của mình (Anti: `C:\Users\VDT\Documents\New_os`, Codex: `C:\Users\VDT\Documents\New_os-codex` qua `git worktree`), không đổi branch trong thư mục của agent kia.
+
+## Việc hiện tại
+**Theo dõi job `smoke` trên `main`** (chạy sau khi job `iso` xong).
+Nếu job đỏ: tải artifact `serial-log` về đọc. Không có dòng `VDTOS-*` thì xem boot treo ở đâu. Sửa trên branch `codex/fix-<tên-lỗi>`, rồi push.
+Lưu ý: `vdtos-report` và các file trong `live/` là phần của Anti. Nếu lỗi nằm ở đó thì ghi lại nguyên nhân vào mô tả commit và chỉ sửa đúng chỗ cần sửa.
+Nếu job xanh: Chờ.
