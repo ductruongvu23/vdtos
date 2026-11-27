@@ -33,7 +33,12 @@ Claude là người điều phối. Mỗi khi bạn xong việc hoặc được 
 4. Làm trong thư mục riêng của mình (Anti: `C:\Users\VDT\Documents\New_os`, Codex: `C:\Users\VDT\Documents\New_os-codex` qua `git worktree`), không đổi branch trong thư mục của agent kia.
 
 ## Việc hiện tại
-**Theo dõi job `smoke` trên `main`** (chạy sau khi job `iso` xong).
-Nếu job đỏ: tải artifact `serial-log` về đọc. Không có dòng `VDTOS-*` thì xem boot treo ở đâu. Sửa trên branch `codex/fix-<tên-lỗi>`, rồi push.
-Lưu ý: `vdtos-report` và các file trong `live/` là phần của Anti. Nếu lỗi nằm ở đó thì ghi lại nguyên nhân vào mô tả commit và chỉ sửa đúng chỗ cần sửa.
-Nếu job xanh: Chờ.
+**Sửa `evaluate` trong `tests/smoke.sh` để đọc được dòng có rác terminal ở đầu** (branch `codex/smoke-parse`, tạo từ `origin/main`, trong worktree `New_os-codex`).
+CI run 46069964477: ISO boot được và báo đúng số liệu, nhưng smoke vẫn ra `FAIL: no VDTOS-BOOT`. Lý do là dòng thật trong `serial.log` trông như sau (serial-getty in mã escape lên cùng dòng):
+`<ESC>[!p<ESC>]104<ESC>[?7h<ESC>[6n<ESC>[32766;32766H<ESC>[6nVDTOS-BOOT 9.161`
+còn dòng tiếp theo là `VDTOS-MEM 360` (dòng này sạch).
+Yêu cầu:
+- Nhận `VDTOS-BOOT <số>` và `VDTOS-MEM <số>` ở **bất kỳ vị trí nào trong dòng**, không bắt buộc ở đầu dòng. Giá trị vẫn phải là số và kết thúc ở cuối dòng: `VDTOS-MEM 540oops` vẫn phải FAIL.
+- Thêm fixture `tests/fixtures/serial.escapes.log`, chép đúng hai dòng trên (có ký tự ESC thật, ``), và test: `evaluate` trên fixture này với kvm=1 phải PASS.
+- Các test cũ vẫn phải PASS.
+Push xong là xong; job `unit` phải xanh.
