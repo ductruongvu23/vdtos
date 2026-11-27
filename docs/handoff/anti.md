@@ -1,19 +1,21 @@
 # Giao việc cho Antigravity (phần chính)
 
-Bạn triển khai **Task 1, 2, 3** của `docs/superpowers/plans/2026-11-27-vdtos.md`, đúng thứ tự.
-Đọc kèm spec `docs/superpowers/specs/2026-11-27-vdtos-design.md`, phần "Global Constraints" và "Review Focus" của plan.
+Bạn làm **Task 1, 2, 3** trong `docs/superpowers/plans/2026-11-27-vdtos.md`, theo đúng thứ tự.
+Đọc kèm spec `docs/superpowers/specs/2026-11-27-vdtos-design.md`, cùng hai phần "Global Constraints" và "Review Focus" của plan.
 
 ## Quy tắc
-- Làm trong WSL2 Debian 13. Clone repo vào `~/New_os`, **không** làm trong `/mnt/c`.
-- Branch: `anti/kernel-live` tạo từ `main`. Không commit thẳng vào `main`, không tạo tag.
-- Mỗi task: viết test trước → chạy thấy FAIL → code → `bash tests/run.sh` PASS → commit theo message trong plan.
-- Chỉ sửa file mà Task 1–3 liệt kê, cộng `.gitignore`. Không sửa `Makefile`, `tests/smoke.sh`, `tests/test_smoke_eval.sh` (Codex làm).
-- Giữ đúng tên hàm và định dạng output trong khối **Interfaces** của từng task, vì Codex code dựa vào đó:
-  `assert_eq`, `assert_fails` (tests/lib.sh), dòng serial `VDTOS-BOOT <giây>` và `VDTOS-MEM <MB>`.
-- Làm xong mỗi task thì `git push -u origin anti/kernel-live`.
+- **Không cần ảo hóa, không cần WSL, VM hay Docker ở máy local.** Bạn chỉ viết code trên Windows rồi push.
+  Mọi việc build và test trên Linux đều chạy ở GitHub Actions (`.github/workflows/build.yml`, **không sửa file này**).
+  Xem kết quả ở tab Actions của repo https://github.com/ductruongvu23/vdtos.
+- Test đơn vị chạy được ở local bằng Git Bash nếu máy có `jq`, `gpg`, `xz`. Nếu thiếu thì push lên rồi xem job `unit`.
+- Script phải chạy được dưới quyền root trong Debian trixie và **không dùng `sudo`**.
+- Branch: `anti/kernel-live` tạo từ `main`. Không commit thẳng vào `main` (đã bị khóa), không tạo tag.
+- Mỗi task: viết test trước → thấy FAIL → viết code → test PASS → commit với message ghi trong plan → `git push -u origin anti/kernel-live`.
+- Chỉ sửa các file Task 1–3 liệt kê, cộng thêm `.gitignore`. Không đụng `Makefile`, `tests/smoke.sh`, `tests/test_smoke_eval.sh` (phần của Codex).
+- Giữ nguyên tên hàm và định dạng output ghi trong khối **Interfaces** của từng task, vì Codex code dựa vào đó:
+  `assert_eq`, `assert_fails` (trong tests/lib.sh), và hai dòng serial `VDTOS-BOOT <giây>`, `VDTOS-MEM <MB>`.
 
 ## Xong khi
-- `bash tests/run.sh` PASS.
-- `bash kernel/build.sh` ra đúng 1 file `live/config/packages.chroot/linux-image-*-vdtos*.deb`.
-- `cd live && lb config` exit 0.
-- Ghi vào mô tả PR (hoặc báo lại): phiên bản kernel đã build và output của `tests/run.sh`.
+- Job `unit` trên branch `anti/kernel-live` xanh: `tests/run.sh` PASS và `lb config` chạy được.
+- Job `kernel` sẽ tự chạy sau khi phần `Makefile` của Codex được merge vào. Lúc đó nếu job đỏ thì bạn sửa.
+- Báo lại: link tới lần chạy Actions đã xanh.

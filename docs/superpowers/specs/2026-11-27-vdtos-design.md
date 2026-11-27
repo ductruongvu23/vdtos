@@ -14,6 +14,7 @@ nhanh, ít dịch vụ nền, giao diện nhẹ, ít đọc ghi đĩa.
 ## Cấu trúc repo
 ```
 Makefile
+.github/workflows/build.yml
 kernel/fetch.sh  kernel/build.sh  kernel/config.fragment
 live/auto/config
 live/config/package-lists/desktop.list.chroot
@@ -27,13 +28,13 @@ docs/superpowers/specs/2026-11-27-vdtos-design.md
 README.md
 ```
 
-## Task 0: Máy build (người dùng tự chạy, cần quyền admin)
-```powershell
-wsl --install -d Debian
-```
-Sau đó vào WSL chạy: `sudo apt install build-essential bc bison flex libssl-dev libelf-dev dwarves rsync cpio kmod dpkg-dev fakeroot gnupg2 curl jq xz-utils live-build qemu-system-x86 xorriso`.
-Repo nằm trên ổ Linux của WSL (`~/New_os`), **không** đặt ở `/mnt/c`. Lý do: live-build cần chmod và device node,
-mà NTFS không hỗ trợ. Thư mục Windows hiện tại chỉ giữ bản git để đồng bộ.
+## Task 0: Máy build là GitHub Actions
+Máy dev không bật ảo hóa, nên không dùng WSL2, VM hay QEMU-KVM ở local. Mọi bước build và test chạy trên GitHub Actions,
+cấu hình ở `.github/workflows/build.yml`, chạy mỗi lần push lên bất kỳ branch nào:
+`unit` (`bash tests/run.sh` + `lb config` trong container `debian:trixie`) → `kernel` (`make kernel` trong docker, cache theo
+phiên bản kernel và nội dung `kernel/**`) → `iso` (`make iso` trong docker `--privileged`) → `smoke` (`bash tests/smoke.sh`
+trên runner có `/dev/kvm`) → `release` (chỉ chạy khi push tag `v*`, đăng ISO lên GitHub Releases).
+Ở local chỉ sửa code và push. Muốn chạy test đơn vị trên máy thì dùng Git Bash, nếu có `jq`/`gpg`/`xz`; không có thì cứ để CI chạy.
 
 ## Task 1: git init + spec
 Chạy `git init`, ghi phần thiết kế ở file này vào `docs/superpowers/specs/2026-11-27-vdtos-design.md` và `README.md`
@@ -109,15 +110,16 @@ Phần chỉnh để máy nhẹ hơn (`includes.chroot`):
   -append "boot=live components console=ttyS0 vdtos.test preempt=full" -serial file:out/serial.log -display none`.
 - grep `VDTOS-MEM`. Lớn hơn 700 hoặc không thấy dòng này thì FAIL. `VDTOS-BOOT` > 30 cũng FAIL, nhưng chỉ kiểm tra
   khi có `/dev/kvm`. Với TCG thì chỉ in cảnh báo, vì giả lập chậm nên đo thời gian không có ý nghĩa.
-- Makefile: `kernel` (fetch + build), `iso` (`cd live && lb clean && lb config && sudo lb build`, log ghi vào `out/build.log`, ISO chép ra `out/`), `test`, `clean`.
+- Makefile: `kernel` (fetch + build), `iso` (phải chạy bằng root, không dùng `sudo`: `cd live && lb clean && lb config && lb build`, log ghi vào `out/build.log`, ISO chép ra `out/`), `test`, `clean`.
 - Mọi script dùng `set -euo pipefail`.
 
 ## Kiểm chứng
-1. `make kernel` ra được file `.deb` có `-vdtos`. Chạy `dpkg-deb -c` trên file đó phải thấy `boot/vmlinuz-*-vdtos`.
-2. `make iso`: trong log không có lỗi, và ISO chứa `live/vmlinuz-*-vdtos`. Đây là chỗ rủi ro nhất: chưa chắc
+1. Job `kernel` trên CI xanh, artifact `kernel-deb` có file `.deb` chứa `boot/vmlinuz-*-vdtos`.
+2. Job `iso` xanh, và ISO chứa `live/vmlinuz-*-vdtos`. Đây là chỗ rủi ro nhất: chưa chắc
    `--linux-packages none` vẫn chép kernel từ chroot ra. Nếu không chép, sửa bằng một hook `binary` tự chép.
-3. `make test` PASS.
-4. Kiểm tra bằng tay qua QEMU có màn hình: Firefox mở trang web được, có tiếng (`-audiodev pa` / `-device intel-hda`), cài thử ra đĩa ảo bằng d-i rồi boot lại.
+3. Job `smoke` xanh (log ở artifact `serial-log`).
+4. Kiểm tra bằng tay: tải ISO từ artifact hoặc Release, ghi ra USB, boot trên máy thật. Firefox mở trang web được, có tiếng,
+   cài ra ổ đĩa rồi boot lại. (Không có máy thử thì có thể dùng QEMU cho Windows ở chế độ TCG, không cần ảo hóa nhưng rất chậm.)
 5. Nếu có máy i3 gen2 thật: boot từ USB rồi chạy lại `free -m` và `systemd-analyze`.
 
 ## Ngoài phạm vi
