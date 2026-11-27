@@ -9,8 +9,8 @@ evaluate() {
     fi
     awk -v kvm="$kvm" '
         { sub(/\r$/, "") }
-        /^VDTOS-MEM [0-9]+$/ { mem = $2; has_mem = 1 }
-        /^VDTOS-BOOT [0-9]+([.][0-9]+)?$/ { boot = $2; has_boot = 1 }
+        /VDTOS-MEM [0-9]+$/ { mem = $NF; has_mem = 1 }
+        /VDTOS-BOOT [0-9]+([.][0-9]+)?$/ { boot = $NF; has_boot = 1 }
         END {
             if (!has_mem) { print "FAIL: no VDTOS-MEM"; exit 1 }
             if (!has_boot) { print "FAIL: no VDTOS-BOOT"; exit 1 }
