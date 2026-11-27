@@ -1,10 +1,26 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/../kernel-pkg.sh"
+
+shopt -s nullglob
+debs=("$SCRIPT_DIR"/../config/packages.chroot/linux-image-*-vdtos_*.deb)
+shopt -u nullglob
+
+linux_args=()
+if (( ${#debs[@]} > 0 )); then
+  pkg="$(kernel_pkg_from_deb "${debs[0]}")"
+  linux_args=(--linux-flavours vdtos --linux-packages "$pkg")
+else
+  echo "WARN: no vdtos kernel .deb in config/packages.chroot; using --linux-packages none" >&2
+  linux_args=(--linux-packages none)
+fi
+
 lb config noauto \
   --distribution trixie \
   --archive-areas "main contrib non-free non-free-firmware" \
-  --linux-packages none \
+  "${linux_args[@]}" \
   --apt-recommends false \
   --debian-installer live \
   --iso-volume VDTOS --image-name vdtos \
