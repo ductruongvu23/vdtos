@@ -1,6 +1,6 @@
 # Giao việc cho Codex (phần phụ)
 
-Bạn triển khai **Task 4, Step 1–4** của `docs/superpowers/plans/2026-11-27-newos.md`: `tests/smoke.sh` (hàm `evaluate` + `main`),
+Bạn triển khai **Task 4, Step 1–4** của `docs/superpowers/plans/2026-11-27-vdtos.md`: `tests/smoke.sh` (hàm `evaluate` + `main`),
 các fixture `tests/fixtures/serial.*.log`, `tests/test_smoke_eval.sh` và `Makefile`.
 Step 5–6 (build ISO thật, `make test`) sẽ chạy sau khi branch của Antigravity đã merge.
 
@@ -11,7 +11,7 @@ Step 5–6 (build ISO thật, `make test`) sẽ chạy sau khi branch của Anti
   `assert_eq <expected> <actual> <msg>`, `assert_fails <cmd...>` (lỗi thì in msg rồi exit 1).
   Test của bạn `source tests/lib.sh`. Để test chạy được ngay, bạn được tạo bản tạm `tests/lib.sh` trên branch của mình;
   khi merge sẽ lấy bản của Antigravity.
-- Dòng serial cần đọc: `NEWOS-BOOT <giây, số thập phân>` và `NEWOS-MEM <MB, số nguyên>`. Ngưỡng: RAM < 700, boot < 30 giây (chỉ áp khi có KVM).
+- Dòng serial cần đọc: `VDTOS-BOOT <giây, số thập phân>` và `VDTOS-MEM <MB, số nguyên>`. Ngưỡng: RAM < 700, boot < 30 giây (chỉ áp khi có KVM).
 - Script dùng `#!/usr/bin/env bash`, `set -euo pipefail`, xuống dòng LF, và chỉ chạy `main "$@"` khi file được gọi trực tiếp.
 - Xong thì `git push -u origin codex/smoke`.
 
