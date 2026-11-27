@@ -1,0 +1,11 @@
+[Unit]
+Description=VDTOS smoke test boot and memory report
+After=graphical.target
+ConditionKernelCommandLine=vdtos.test
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/vdtos-report
+
+[Install]
+WantedBy=graphical.target

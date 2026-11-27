@@ -1,0 +1,6 @@
+live-boot live-config live-config-systemd initramfs-tools sudo locales
+xserver-xorg-core xserver-xorg-input-libinput xserver-xorg-video-intel
+xfce4 xfce4-terminal thunar mousepad lightdm lightdm-gtk-greeter
+network-manager-gnome pipewire-audio wireplumber pavucontrol
+firefox-esr fonts-noto-core zram-tools intel-microcode
+firmware-misc-nonfree firmware-realtek firmware-iwlwifi
