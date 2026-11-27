@@ -41,4 +41,6 @@ main() {
   printf '%s\n' "$kver" > build/KVER
 }
 
-[[ "${BASH_SOURCE[0]}" == "$0" ]] && main "$@"
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+  main "$@"
+fi
