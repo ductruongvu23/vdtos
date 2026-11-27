@@ -1,0 +1,9 @@
+{
+  "releases": [
+    {"moniker": "mainline", "version": "6.19-rc3"},
+    {"moniker": "stable", "version": "6.18.2"},
+    {"moniker": "longterm", "version": "6.6.120"},
+    {"moniker": "longterm", "version": "6.12.9"},
+    {"moniker": "longterm", "version": "5.15.180"}
+  ]
+}
