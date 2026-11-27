@@ -4,7 +4,7 @@ After=graphical.target
 ConditionKernelCommandLine=vdtos.test
 
 [Service]
-Type=oneshot
+Type=simple
 ExecStart=/usr/local/bin/vdtos-report
 
 [Install]
