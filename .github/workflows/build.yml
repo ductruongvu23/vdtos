@@ -70,8 +70,24 @@ jobs:
       - if: steps.cache.outputs.cache-hit != 'true'
         name: Free disk
         run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
+      # ccache survives failed runs (save runs on always()), so a late failure no longer costs a full rebuild.
+      # Caches from feature branches are not visible to main; main seeds its own.
       - if: steps.cache.outputs.cache-hit != 'true'
-        run: docker run --rm -v "$PWD:/w" -w /w debian:trixie bash -c "apt-get update && apt-get install -y --no-install-recommends $KERNEL_DEPS && make kernel"
+        uses: actions/cache/restore@v4
+        with:
+          path: .ccache
+          key: ccache-${{ github.run_id }}
+          restore-keys: ccache-
+      - if: steps.cache.outputs.cache-hit != 'true'
+        run: >
+          docker run --rm -v "$PWD:/w" -w /w
+          -e CCACHE_DIR=/w/.ccache -e CCACHE_MAXSIZE=6G -e KCC="ccache gcc"
+          debian:trixie bash -c "apt-get update && apt-get install -y --no-install-recommends $KERNEL_DEPS && ccache -z && make kernel; rc=\$?; ccache -s; exit \$rc"
+      - if: always() && steps.cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: .ccache
+          key: ccache-${{ github.run_id }}
       - uses: actions/upload-artifact@v4
         with:
           name: kernel-deb
