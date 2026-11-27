@@ -30,7 +30,7 @@ Claude là người điều phối. Mỗi khi bạn xong việc hoặc được 
 4. Làm trong thư mục riêng của mình (Anti: `C:\Users\VDT\Documents\New_os`, Codex: `C:\Users\VDT\Documents\New_os-codex` qua `git worktree`), không đổi branch trong thư mục của agent kia.
 
 ## Việc hiện tại
-**Theo dõi job `kernel` và `iso` trên `main`** (lần chạy đầu tiên đang chạy, build kernel mất khoảng 1 giờ).
-Nếu một trong hai job đỏ: đọc log (với job `iso` thì xem artifact `build-log`), sửa trên branch `anti/fix-<tên-lỗi>`, rồi push.
-Chỗ rủi ro nhất: ISO không có `live/vmlinuz-*-vdtos`. Xem cách xử lý ở Task 4 Step 5 trong plan (hook `9000-copy-kernel.hook.binary`).
-Nếu cả hai job xanh: Chờ.
+**Sửa `kernel/build.sh`: lỗi `tmp: unbound variable` lúc thoát** (log CI run 46044983545).
+Nguyên nhân: `trap 'rm -rf "$tmp"' EXIT` được đặt trong `main` với `local tmp`. Trap chạy sau khi `main` đã return, lúc đó không còn biến `tmp`, nên `set -u` báo lỗi.
+Cách sửa: dùng `trap 'rm -rf "$tmp"' RETURN` thay cho EXIT, hoặc bỏ `local` cho `tmp`. Chọn một cách, branch `anti/fix-build-trap`, rồi push.
+(Lỗi thiếu `libdw-dev` là ở CI, Claude đã sửa xong.) Sau đó: theo dõi job `kernel`/`iso` trên `main`. Đỏ thì sửa, xanh thì Chờ.
