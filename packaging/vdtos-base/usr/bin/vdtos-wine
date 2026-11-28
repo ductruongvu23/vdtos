@@ -52,6 +52,7 @@ cmd_init() {
     WINEDLLOVERRIDES="mscoree,mshtml=" wineboot -i
   fi
   cmd_apply_theme dark
+  run_cmd wineserver -w
 }
 
 cmd_run() {
@@ -103,6 +104,7 @@ cmd_reset() {
   if (( DRY_RUN )); then
     printf 'WINEDLLOVERRIDES=mscoree,mshtml= wineboot -i\n'
     cmd_apply_theme dark
+    run_cmd wineserver -w
   else
     cmd_init
   fi

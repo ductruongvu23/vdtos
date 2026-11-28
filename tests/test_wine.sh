@@ -80,6 +80,7 @@ export WINEPREFIX="$tmp/nonexistent-wine"
 out_init="$(bash "$vw" --dry-run init)"
 grep -qF 'wineboot -i' <<< "$out_init" || { echo "FAIL: init dry-run missing wineboot -i" >&2; exit 1; }
 grep -qF 'dark.reg' <<< "$out_init" || { echo "FAIL: init dry-run missing dark.reg" >&2; exit 1; }
+grep -qF 'wineserver -w' <<< "$out_init" || { echo "FAIL: init dry-run missing wineserver -w" >&2; exit 1; }
 
 out_run="$(bash "$vw" --dry-run run /tmp/app.exe)"
 grep -qF 'wine start /unix /tmp/app.exe' <<< "$out_run" || { echo "FAIL: run dry-run missing wine start" >&2; exit 1; }

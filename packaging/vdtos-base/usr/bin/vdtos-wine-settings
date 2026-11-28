@@ -99,8 +99,8 @@ def launch_gui(dry_run=False):
             theme_box = Gtk.Box(spacing=6)
             btn_dark = Gtk.Button(label="Tối")
             btn_light = Gtk.Button(label="Sáng")
-            btn_dark.connect("clicked", lambda *_: self._run_async(["vdtos-wine", "apply-theme", "dark"], "Đã áp dụng giao diện Tối"))
-            btn_light.connect("clicked", lambda *_: self._run_async(["vdtos-wine", "apply-theme", "light"], "Đã áp dụng giao diện Sáng"))
+            btn_dark.connect("clicked", lambda *_: self._run_async(["vdtos-wine", "apply-theme", "dark"], "Đã áp dụng. Mở lại app Windows để thấy thay đổi."))
+            btn_light.connect("clicked", lambda *_: self._run_async(["vdtos-wine", "apply-theme", "light"], "Đã áp dụng. Mở lại app Windows để thấy thay đổi."))
             theme_box.pack_start(btn_dark, True, True, 0)
             theme_box.pack_start(btn_light, True, True, 0)
             cfg_grid.attach(theme_box, 1, 0, 1, 1)
@@ -117,7 +117,7 @@ def launch_gui(dry_run=False):
                 "clicked",
                 lambda *_: self._run_async(
                     ["vdtos-wine", "set-dpi", dpi_combo.get_active_id() or "96"],
-                    "Đã cập nhật DPI",
+                    "Đã áp dụng. Mở lại app Windows để thấy thay đổi.",
                 ),
             )
             dpi_box = Gtk.Box(spacing=6)

@@ -20,6 +20,7 @@ fi
 
 grep -qF 'Name=Tinh chỉnh Wine' "$desktop" || { echo "FAIL: desktop missing Vietnamese Name" >&2; exit 1; }
 grep -qF 'Exec=vdtos-wine-settings' "$desktop" || { echo "FAIL: desktop missing Exec" >&2; exit 1; }
+grep -qF 'Đã áp dụng. Mở lại app Windows để thấy thay đổi.' "$app" || { echo "FAIL: app missing reopen hint" >&2; exit 1; }
 
 tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
