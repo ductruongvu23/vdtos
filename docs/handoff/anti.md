@@ -30,4 +30,22 @@ Claude là người điều phối. Mỗi khi bạn xong việc hoặc được 
 4. Làm trong thư mục riêng của mình (Anti: `C:\Users\VDT\Documents\New_os`, Codex: `C:\Users\VDT\Documents\New_os-codex` qua `git worktree`), không đổi branch trong thư mục của agent kia.
 
 ## Việc hiện tại
-Chờ. Task 1–4 của plan đã xong: smoke test trên `main` xanh (run 46072258141: boot 9.082 s, RAM 384 MB). Task 5 là kiểm tra bằng tay, do người dùng làm.
+**Kho apt để cập nhật tại chỗ** (branch `anti/apt-repo`, tạo từ `main`). Đọc **Task 7** trong spec trước.
+Bạn làm:
+1. `packaging/build-debs.sh <version> <kernel-deb> <out-dir>`: build `vdtos-base_<version>_all.deb` và
+   `linux-image-vdtos_<X.Y.Z>_amd64.deb` bằng `dpkg-deb --build --root-owner-group` từ thư mục dựng tạm (không cần debhelper).
+   Lấy X.Y.Z bằng `dpkg-deb -f <kernel-deb> Version` bỏ đuôi `-N`. File của `vdtos-base` lấy từ `packaging/vdtos-base/`
+   (chuyển nguyên các file đang ở `live/config/includes.chroot/` sang đây bằng `git mv`, kèm `DEBIAN/postinst`).
+2. `apt/build-repo.sh <debs-dir> <out-dir>`: dựng `pool/main/` + `dists/vdtos/main/binary-amd64/Packages{,.gz}` +
+   `dists/vdtos/Release` bằng `apt-ftparchive`, rồi ký ra `InRelease` và `Release.gpg` bằng key trong keyring GPG hiện tại
+   (id lấy từ biến `APT_GPG_KEY_ID`). Thiếu biến hoặc ký lỗi thì exit 1.
+3. `live/`: bỏ `includes.chroot/` và hook 0100; `make iso` gọi `packaging/build-debs.sh` để thả hai gói vào `packages.chroot`
+   và thêm `vdtos-base linux-image-vdtos` vào package list. `live/auto/config` giữ `--linux-packages` như hiện tại.
+4. Test (thêm vào `tests/`, chạy qua `tests/run.sh`):
+   - `test_packaging.sh`: dùng một kernel .deb giả (dựng bằng dpkg-deb trong test). Kiểm tra `vdtos-base` chứa đủ các file cũ,
+     có keyring + `vdtos.sources`, `Depends` đúng; `linux-image-vdtos` có `Version` = X.Y.Z và `Depends: linux-image-X.Y.Z-vdtos`.
+   - `test_apt_repo.sh`: tạo key GPG tạm (`gpg --batch --quick-gen-key` trong `GNUPGHOME` tạm, không mật khẩu), dựng kho,
+     rồi `gpgv` kiểm `InRelease` qua được, và `Packages` có đủ hai gói. Thiếu `APT_GPG_KEY_ID` thì `build-repo.sh` phải fail.
+- Bỏ qua phần public key thật `apt/vdtos-archive-keyring.asc` và job CI `apt`: Claude làm (key và GitHub Pages cần người dùng
+  đồng ý). Trong `vdtos-base`, keyring lấy từ `apt/vdtos-archive-keyring.asc` nếu có; chưa có thì build vẫn chạy nhưng in WARN.
+- Không sửa `.github/workflows/build.yml`. Push xong là xong; job `unit` phải xanh và job `smoke` vẫn phải xanh (ISO đổi cách cài file).

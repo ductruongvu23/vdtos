@@ -113,6 +113,22 @@ Phần chỉnh để máy nhẹ hơn (`includes.chroot`):
 - Makefile: `kernel` (fetch + build), `iso` (phải chạy bằng root, không dùng `sudo`: `cd live && lb clean && lb config && lb build`, log ghi vào `out/build.log`, ISO chép ra `out/`), `test`, `clean`.
 - Mọi script dùng `set -euo pipefail`.
 
+## Task 7: Kho apt, cập nhật tại chỗ (thêm 2026-11-28)
+Máy đã cài nhận kernel mới và tinh chỉnh mới của VDTOS bằng `sudo apt update && sudo apt full-upgrade`, không cần cài lại.
+- Kho: `https://ductruongvu23.github.io/vdtos` (GitHub Pages), suite `vdtos`, component `main`, chỉ `amd64`. Ký GPG
+  (`InRelease` + `Release.gpg`). Chỉ giữ bản mới nhất của mỗi gói (Pages giới hạn 1GB).
+- Gói `vdtos-base` (Architecture: all, Version = số phiên bản tag bỏ chữ `v`): chứa toàn bộ file đang nằm ở
+  `live/config/includes.chroot/` (zramswap, sysctl, udev, xfwm4, vdtos-report + service), keyring
+  `/usr/share/keyrings/vdtos-archive-keyring.asc` và `/etc/apt/sources.list.d/vdtos.sources` trỏ tới kho trên.
+  `Depends: linux-image-vdtos, zram-tools`. `postinst` bật `vdtos-report.service` (thay hook 0100) và chạy `sysctl --system`.
+- Gói meta `linux-image-vdtos` (Architecture: amd64, Version = `X.Y.Z`): `Depends: linux-image-X.Y.Z-vdtos`. Đây là lý do
+  `apt full-upgrade` kéo được kernel mới dù tên gói kernel đổi theo phiên bản. Kernel cũ vẫn nằm lại làm lựa chọn trong GRUB.
+- ISO cài `vdtos-base` và `linux-image-vdtos` qua `packages.chroot`; các file trong `includes.chroot` và hook 0100 bị bỏ,
+  để mỗi file chỉ có một nguồn.
+- CI (job `apt`, chạy khi push tag sau `release`): build hai gói, dựng kho bằng `apt-ftparchive`, ký bằng secret
+  `APT_GPG_PRIVATE_KEY`, đẩy lên Pages. Public key nằm trong repo ở `apt/vdtos-archive-keyring.asc`.
+- Máy đã cài từ v0.1.0 (chưa có `vdtos-base`): chỉ cần một lần tải `vdtos-base_*.deb` từ Release rồi `sudo apt install ./vdtos-base_*.deb`.
+
 ## Kiểm chứng
 1. Job `kernel` trên CI xanh, artifact `kernel-deb` có file `.deb` chứa `boot/vmlinuz-*-vdtos`.
 2. Job `iso` xanh, và ISO chứa `live/vmlinuz-*-vdtos`. Đây là chỗ rủi ro nhất: chưa chắc
@@ -123,5 +139,5 @@ Phần chỉnh để máy nhẹ hơn (`includes.chroot`):
 5. Nếu có máy i3 gen2 thật: boot từ USB rồi chạy lại `free -m` và `systemd-analyze`.
 
 ## Ngoài phạm vi
-Kho apt riêng, branding, bản 32-bit, Secure Boot (bản đầu phải tắt Secure Boot), tự động cập nhật kernel, bộ gõ tiếng Việt
+Branding, bản 32-bit, Secure Boot (bản đầu phải tắt Secure Boot), tự cập nhật không cần người bấm (unattended-upgrades), bộ gõ tiếng Việt
 (nếu cần thì thêm `fcitx5-unikey` vào package list, chỉ một dòng).
