@@ -51,8 +51,11 @@ Maintainer: VDTOS <vdtos@example.invalid>
 Description: VDTOS base configuration, tuning, and apt repository
 EOF
 
-  mkdir -p "$base_dir/etc/apt/sources.list.d"
-  cat > "$base_dir/etc/apt/sources.list.d/vdtos.sources" <<'EOF'
+  local keyring_src="${APT_KEYRING:-$root_dir/apt/vdtos-archive-keyring.asc}"
+  if [[ -f "$keyring_src" ]]; then
+    install -Dm644 "$keyring_src" "$base_dir/usr/share/keyrings/vdtos-archive-keyring.asc"
+    mkdir -p "$base_dir/etc/apt/sources.list.d"
+    cat > "$base_dir/etc/apt/sources.list.d/vdtos.sources" <<'EOF'
 Types: deb
 URIs: https://ductruongvu23.github.io/vdtos
 Suites: vdtos
@@ -60,12 +63,8 @@ Components: main
 Architectures: amd64
 Signed-By: /usr/share/keyrings/vdtos-archive-keyring.asc
 EOF
-
-  local keyring_src="${APT_KEYRING:-$root_dir/apt/vdtos-archive-keyring.asc}"
-  if [[ -f "$keyring_src" ]]; then
-    install -Dm644 "$keyring_src" "$base_dir/usr/share/keyrings/vdtos-archive-keyring.asc"
   else
-    echo "WARN: $keyring_src not found; vdtos-base will not include archive keyring" >&2
+    echo "WARN: $keyring_src not found; skipping vdtos.sources and archive keyring" >&2
   fi
 
   dpkg-deb --build --root-owner-group "$base_dir" \
