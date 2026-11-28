@@ -49,8 +49,10 @@ gpg --export "$key_id" > "$tmp/pub.gpg"
 
 APT_GPG_KEY_ID="$key_id" bash "$ROOT_DIR/apt/build-repo.sh" "$tmp/debs" "$tmp/repo"
 
-gpgv --keyring "$tmp/pub.gpg" "$tmp/repo/dists/vdtos/InRelease"
-gpgv --keyring "$tmp/pub.gpg" "$tmp/repo/dists/vdtos/Release.gpg" "$tmp/repo/dists/vdtos/Release"
+mkdir -p "$tmp/verify-gnupg"
+chmod 700 "$tmp/verify-gnupg"
+GNUPGHOME="$tmp/verify-gnupg" gpg --no-default-keyring --keyring "$tmp/pub.gpg" --verify "$tmp/repo/dists/vdtos/InRelease"
+GNUPGHOME="$tmp/verify-gnupg" gpg --no-default-keyring --keyring "$tmp/pub.gpg" --verify "$tmp/repo/dists/vdtos/Release.gpg" "$tmp/repo/dists/vdtos/Release"
 
 pkgs_file="$tmp/repo/dists/vdtos/main/binary-amd64/Packages"
 [[ -f "$pkgs_file" ]] || { echo "FAIL: missing $pkgs_file" >&2; exit 1; }
