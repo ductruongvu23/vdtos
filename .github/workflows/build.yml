@@ -147,10 +147,29 @@ jobs:
     permissions:
       contents: write
     steps:
+      - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
           name: iso
           path: out
-      - run: gh release create "$GITHUB_REF_NAME" out/vdtos-amd64.hybrid.iso --repo "$GITHUB_REPOSITORY" --generate-notes
+      - uses: actions/download-artifact@v4
+        with:
+          name: kernel-deb
+          path: out/kernel
+      # GPL: ship the exact kernel source (unpatched kernel.org tarball + signature) and the .config it was built with
+      - name: Collect kernel source and config
+        run: |
+          deb=$(ls out/kernel/linux-image-*-vdtos_*.deb | grep -v -- '-dbg_' | head -n1)
+          kver=$(dpkg-deb -f "$deb" Version); kver=${kver%-*}
+          base="https://cdn.kernel.org/pub/linux/kernel/v${kver%%.*}.x"
+          curl -fsSL "$base/linux-$kver.tar.xz" -o "out/linux-$kver.tar.xz"
+          curl -fsSL "$base/linux-$kver.tar.sign" -o "out/linux-$kver.tar.sign"
+          gpg --locate-keys torvalds@kernel.org gregkh@kernel.org
+          bash -c 'source kernel/fetch.sh; verify_tarball "$1" "$2"' _ "out/linux-$kver.tar.xz" "out/linux-$kver.tar.sign"
+          dpkg-deb --fsys-tarfile "$deb" | tar -xO --wildcards './boot/config-*' > "out/config-$kver-vdtos"
+          cp "$deb" out/
+      - run: >
+          gh release create "$GITHUB_REF_NAME" out/vdtos-amd64.hybrid.iso out/linux-*.tar.xz out/linux-*.tar.sign
+          out/config-*-vdtos out/linux-image-*.deb --repo "$GITHUB_REPOSITORY" --generate-notes
         env:
           GH_TOKEN: ${{ github.token }}
