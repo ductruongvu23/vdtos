@@ -98,4 +98,11 @@ assert_fails bash "$vw" --dry-run apply-theme invalid
 assert_fails bash "$vw" --dry-run set-dpi 999
 assert_fails bash "$vw" --dry-run unknown-cmd
 
+# Check wine32 hook exists and verifies 32-bit notepad.exe
+wine32_hook="$ROOT_DIR/live/config/hooks/live/0010-wine32.hook.chroot"
+[[ -x "$wine32_hook" ]] || { echo "FAIL: missing or non-executable $wine32_hook" >&2; exit 1; }
+grep -qF 'dpkg --add-architecture i386' "$wine32_hook" || { echo "FAIL: hook missing i386 arch" >&2; exit 1; }
+grep -qF 'wine32:i386' "$wine32_hook" || { echo "FAIL: hook missing wine32:i386" >&2; exit 1; }
+grep -qF 'notepad.exe' "$wine32_hook" || { echo "FAIL: hook missing notepad.exe check" >&2; exit 1; }
+
 echo "test_wine.sh: OK"
