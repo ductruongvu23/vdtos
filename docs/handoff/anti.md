@@ -30,18 +30,23 @@ Claude là người điều phối. Mỗi khi bạn xong việc hoặc được 
 4. Làm trong thư mục riêng của mình (Anti: `C:\Users\VDT\Documents\New_os`, Codex: `C:\Users\VDT\Documents\New_os-codex` qua `git worktree`), không đổi branch trong thư mục của agent kia.
 
 ## Việc hiện tại
-**Sửa bản live không có tài khoản và hình nền SVG không hiện** (branch `anti/live-user`, tạo từ `main`).
-Ảnh chụp ISO v0.2.0 trong QEMU: LightDM hiện màn hình đăng nhập thay vì tự vào desktop. Đăng nhập bằng `user` / `live`
-thì bị báo sai mật khẩu. Nền màn hình đăng nhập đen, không có `default.svg`.
-Nguyên nhân: ISO build với `--apt-recommends false`, nên thiếu hai gói vốn chỉ là Recommends:
-- `user-setup`: `live-config` cần gói này để tạo tài khoản live và bật tự đăng nhập cho LightDM.
-- `librsvg2-common`: loader SVG cho gdk-pixbuf; thiếu gói này thì greeter và xfdesktop không vẽ được hình nền `.svg`.
+**Dock hiện rõ ở cạnh dưới màn hình và sửa lỗi plugin nguồn** (branch `anti/dock`, tạo từ `main` sau PR #41).
+Ảnh chụp ISO từ run 46141959434 cho thấy desktop đã tự đăng nhập, có hình nền và menu. Còn hai lỗi:
+1. Vừa vào desktop là hiện hộp thoại *Plugin "power-manager-plugin" could not be loaded*. Gói `xfce4-power-manager-plugins`
+   chỉ là Recommends nên không có trong ISO (vì `--apt-recommends false`).
+2. Không thấy dock. Trong `packaging/vdtos-base/etc/xdg/vdtos/xfce4/panel/default.xml`, `panel-2` có `autohide-behavior` = 1
+   và `length` = 1. docklike lại chưa ghim ứng dụng nào, nên panel co lại gần như không còn gì.
 
 Việc cần làm:
-- Thêm `user-setup` vào `live/config/package-lists/desktop.list.chroot`, cùng dòng với `live-config`.
-- Thêm `librsvg2-common` vào `live/config/package-lists/ui.list.chroot`, và vào `Depends` của `vdtos-base` trong
-  `packaging/build-debs.sh` (máy đã cài cũng cần gói này để hiện hình nền khi `apt full-upgrade`).
-- Test: `tests/test_packaging.sh` kiểm `Depends` có `librsvg2-common`; `test_packages.sh` sẵn có sẽ kiểm hai tên gói có trong trixie.
-- Không sửa `--apt-recommends false`, không sửa `.github/workflows`, `Makefile`, `tests/smoke.sh`.
+- Thêm `xfce4-power-manager-plugins` vào `live/config/package-lists/ui.list.chroot` và vào `Depends` của `vdtos-base` (`packaging/build-debs.sh`).
+  Kiểm tra các plugin còn lại của panel (`pulseaudio`, `systray`, `actions`, `docklike`, `whiskermenu`) xem gói chứa chúng
+  có nằm trong danh sách gói không. Gói nào chỉ là Recommends thì thêm luôn, ví dụ `xfce4-pulseaudio-plugin`.
+- `panel-2`, tức dock: giữ ở cạnh dưới, căn giữa (`p=10`); `autohide-behavior` = 0 (luôn hiện); `size` 48; nền bo tròn hoặc trong mờ nhẹ nếu Orchis hỗ trợ.
+- Ghim sẵn ứng dụng vào docklike: Firefox ESR, Thunar, Terminal, Mousepad. Cấu hình của docklike nằm ở file
+  `xfce4/panel/docklike-9.rc` (9 là id plugin). Đặt file này dưới `/etc/xdg/vdtos/`; nếu docklike không đọc XDG_CONFIG_DIRS thì
+  chép vào `/etc/skel/.config/xfce4/panel/`. Đọc mã nguồn hoặc tài liệu docklike của trixie để lấy đúng định dạng khoá `pinned`.
+- Test (`tests/test_ui.sh`): `Depends` có `xfce4-power-manager-plugins`; `default.xml` của `panel-2` có `autohide-behavior` = 0;
+  file cấu hình docklike có trong gói và liệt kê đủ 4 file `.desktop`; mọi XML parse được.
+- Không sửa `.github/workflows`, `Makefile`, `tests/smoke.sh`.
 
-Push xong là xong; `unit`, `iso`, `smoke` phải xanh. Claude sẽ tự chạy ISO trong QEMU để xem có vào thẳng desktop không.
+Push xong là xong; `unit`, `iso`, `smoke` phải xanh. Claude sẽ chạy ISO trong QEMU và chụp dock.
