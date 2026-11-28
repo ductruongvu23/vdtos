@@ -1,0 +1,4 @@
+[Default Applications]
+application/x-ms-dos-executable=vdtos-wine-run.desktop
+application/x-msi=vdtos-wine-run.desktop
+application/x-ms-shortcut=vdtos-wine-run.desktop

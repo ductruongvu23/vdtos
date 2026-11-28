@@ -1,0 +1,142 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+DRY_RUN=0
+
+run_cmd() {
+  if (( DRY_RUN )); then
+    printf '%s\n' "$*"
+    return 0
+  fi
+  "$@"
+}
+
+cmd_apply_theme() {
+  if [[ $# -ne 1 ]]; then
+    echo "Usage: vdtos-wine apply-theme <dark|light>" >&2
+    return 1
+  fi
+
+  local theme="$1"
+  case "$theme" in
+    dark|light) ;;
+    *)
+      echo "ERROR: unknown theme '$theme' (expected dark or light)" >&2
+      return 1
+      ;;
+  esac
+
+  local reg_file="/usr/share/vdtos/wine/${theme}.reg"
+  if (( ! DRY_RUN )) && [[ ! -f "$reg_file" ]]; then
+    echo "ERROR: registry file not found: $reg_file" >&2
+    return 1
+  fi
+
+  run_cmd wine regedit "$reg_file"
+}
+
+cmd_init() {
+  if [[ $# -ne 0 ]]; then
+    echo "Usage: vdtos-wine init" >&2
+    return 1
+  fi
+
+  local prefix="${WINEPREFIX:-$HOME/.wine}"
+  if [[ -d "$prefix" ]]; then
+    return 0
+  fi
+
+  if (( DRY_RUN )); then
+    printf 'WINEDLLOVERRIDES=mscoree,mshtml= wineboot -i\n'
+  else
+    WINEDLLOVERRIDES="mscoree,mshtml=" wineboot -i
+  fi
+  cmd_apply_theme dark
+}
+
+cmd_run() {
+  if [[ $# -ne 1 ]]; then
+    echo "Usage: vdtos-wine run <file>" >&2
+    return 1
+  fi
+
+  local file="$1"
+  if (( ! DRY_RUN )) && [[ ! -f "$file" ]]; then
+    echo "ERROR: file not found: $file" >&2
+    return 1
+  fi
+
+  cmd_init
+  run_cmd wine start /unix "$file"
+}
+
+cmd_set_dpi() {
+  if [[ $# -ne 1 ]]; then
+    echo "Usage: vdtos-wine set-dpi <96|120|144>" >&2
+    return 1
+  fi
+
+  local dpi="$1"
+  case "$dpi" in
+    96|120|144) ;;
+    *)
+      echo "ERROR: invalid DPI '$dpi' (expected 96, 120, or 144)" >&2
+      return 1
+      ;;
+  esac
+
+  run_cmd wine reg add 'HKCU\Control Panel\Desktop' /v LogPixels /t REG_DWORD /d "$dpi" /f
+}
+
+cmd_reset() {
+  if [[ $# -ne 0 ]]; then
+    echo "Usage: vdtos-wine reset" >&2
+    return 1
+  fi
+
+  local prefix="${WINEPREFIX:-$HOME/.wine}"
+  if [[ -d "$prefix" ]]; then
+    local backup="${prefix}.bak-$(date +%Y%m%d-%H%M%S)"
+    run_cmd mv "$prefix" "$backup"
+  fi
+
+  if (( DRY_RUN )); then
+    printf 'WINEDLLOVERRIDES=mscoree,mshtml= wineboot -i\n'
+    cmd_apply_theme dark
+  else
+    cmd_init
+  fi
+}
+
+main() {
+  local args=()
+  for arg in "$@"; do
+    if [[ "$arg" == "--dry-run" ]]; then
+      DRY_RUN=1
+    else
+      args+=("$arg")
+    fi
+  done
+
+  if (( ${#args[@]} == 0 )); then
+    echo "Usage: vdtos-wine [--dry-run] <init|run|apply-theme|set-dpi|reset> [args...]" >&2
+    return 1
+  fi
+
+  local subcmd="${args[0]}"
+  local rest=("${args[@]:1}")
+
+  case "$subcmd" in
+    init)        cmd_init "${rest[@]}" ;;
+    run)         cmd_run "${rest[@]}" ;;
+    apply-theme) cmd_apply_theme "${rest[@]}" ;;
+    set-dpi)     cmd_set_dpi "${rest[@]}" ;;
+    reset)       cmd_reset "${rest[@]}" ;;
+    *)
+      echo "ERROR: unknown subcommand '$subcmd'" >&2
+      return 1
+      ;;
+  esac
+}
+
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then main "$@"; fi

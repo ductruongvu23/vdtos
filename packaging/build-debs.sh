@@ -39,7 +39,7 @@ main() {
   local base_dir="$tmp/vdtos-base"
   mkdir -p "$base_dir"
   cp -a "$script_dir/vdtos-base/." "$base_dir/"
-  chmod 0755 "$base_dir/DEBIAN/postinst" "$base_dir/usr/local/bin/vdtos-report"
+  chmod 0755 "$base_dir/DEBIAN/postinst" "$base_dir/usr/local/bin/vdtos-report" "$base_dir/usr/bin/vdtos-wine"
 
   cat > "$base_dir/DEBIAN/control" <<EOF
 Package: vdtos-base
@@ -47,7 +47,7 @@ Version: ${version}
 Section: metapackages
 Priority: optional
 Architecture: all
-Depends: linux-image-vdtos, zram-tools, orchis-gtk-theme, papirus-icon-theme, fonts-inter, fonts-jetbrains-mono, xfce4-whiskermenu-plugin, xfce4-docklike-plugin, xfce4-power-manager-plugins, xfce4-pulseaudio-plugin, librsvg2-common
+Depends: linux-image-vdtos, zram-tools, orchis-gtk-theme, papirus-icon-theme, fonts-inter, fonts-jetbrains-mono, xfce4-whiskermenu-plugin, xfce4-docklike-plugin, xfce4-power-manager-plugins, xfce4-pulseaudio-plugin, librsvg2-common, wine, wine64, fonts-wine, fonts-liberation, libgl1, libgl1-mesa-dri, libasound2-plugins, gstreamer1.0-plugins-good, python3-gi, gir1.2-gtk-3.0
 Maintainer: VDTOS <vdtos@example.invalid>
 Description: VDTOS base configuration, tuning, and apt repository
 EOF
