@@ -30,11 +30,4 @@ Claude là người điều phối. Mỗi khi bạn xong việc hoặc được 
 4. Làm trong thư mục riêng của mình (Anti: `C:\Users\VDT\Documents\New_os`, Codex: `C:\Users\VDT\Documents\New_os-codex` qua `git worktree`), không đổi branch trong thư mục của agent kia.
 
 ## Việc hiện tại
-**Sửa Task 8: Materia không có trong trixie** (tiếp tục trên branch `anti/modern-ui`). CI run 46122058512, job `unit`:
-`FAIL: package not found in apt-cache: materia-gtk-theme`.
-Đổi sang Orchis (spec Task 8 đã cập nhật):
-- `materia-gtk-theme` → `orchis-gtk-theme` trong `Depends` của `vdtos-base` và trong `live/config/package-lists/ui.list.chroot`.
-- Tên theme `Materia-dark-compact` → `Orchis-Dark-Compact` ở `xsettings.xml`, `xfwm4.xml`, `50-vdtos.conf` và trong `tests/test_ui.sh`.
-  (Đã kiểm: gói có `/usr/share/themes/Orchis-Dark-Compact/{gtk-3.0,xfwm4}`.)
-- NOTICE.md: thay dòng Materia (GPL-2.0) bằng Orchis (GPL-3.0).
-Push lên `anti/modern-ui` là xong; `unit`, `iso`, `smoke` phải xanh.
+Chờ. Task 7 (kho apt, PR #28) và Task 8 (giao diện, PR #37) đã gộp.
