@@ -15,4 +15,4 @@ Mỗi tag `v*` sẽ tạo một GitHub Release kèm file ISO.
 VDTOS là bản phối lại không chính thức của Debian, không liên kết với Debian Project hay kernel.org.
 ISO gồm kernel Linux (GPL-2.0), các gói Debian tự do và một số firmware non-free được phép phân phối lại nguyên bản.
 Chi tiết từng thành phần và nơi lấy mã nguồn: [NOTICE.md](NOTICE.md).
-Mã trong repo này chưa có file LICENSE, nên mọi quyền được bảo lưu.
+Mã trong repo này phát hành theo giấy phép MIT ([LICENSE](LICENSE)).
