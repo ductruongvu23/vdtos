@@ -5,8 +5,8 @@ Mozilla phát triển, bảo trợ hay xác nhận. "Debian" là thương hiệu
 "Linux" là thương hiệu đã đăng ký của Linus Torvalds; "Firefox" là thương hiệu của Mozilla Foundation.
 
 ## Mã nguồn trong repo này
-Các script, file cấu hình và test trong repo do chủ repo viết. Repo **chưa có file LICENSE**: tức là mọi quyền được
-bảo lưu, người khác được xem code trên GitHub nhưng chưa được cấp quyền sao chép hay sửa đổi.
+Các script, file cấu hình và test trong repo do chủ repo viết, phát hành theo giấy phép MIT ([LICENSE](LICENSE)).
+Giấy phép MIT chỉ áp dụng cho code trong repo này, không áp dụng cho các thành phần bên thứ ba trong ISO liệt kê bên dưới.
 
 ## Thành phần bên thứ ba trong ISO
 ISO được build từ các gói Debian 13 (trixie) chính thức, không sửa đổi, cộng với một kernel tự build.
