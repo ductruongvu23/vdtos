@@ -30,17 +30,22 @@ Claude là người điều phối. Mỗi khi bạn xong việc hoặc được 
 4. Làm trong thư mục riêng của mình (Anti: `C:\Users\VDT\Documents\New_os`, Codex: `C:\Users\VDT\Documents\New_os-codex` qua `git worktree`), không đổi branch trong thư mục của agent kia.
 
 ## Việc hiện tại
-**Sửa lỗi ISO: `vdtos-base` đè file của `zram-tools`** (tiếp tục trên branch `anti/apt-repo`; Claude đã merge `main` vào
-branch này nên trước tiên `git fetch && git switch anti/apt-repo && git pull --ff-only`). PR #28.
-Log CI run 46117280262, job `iso`:
-`dpkg: error processing archive .../vdtos-base_0.1.0_all.deb (--unpack): trying to overwrite '/etc/default/zramswap', which is also in package zram-tools`.
-Nguyên nhân: một file chỉ được thuộc về một gói. Trước đây `includes.chroot` chép đè lặng lẽ, giờ đóng gói thì dpkg chặn.
-Cách sửa:
-- Bỏ `packaging/vdtos-base/etc/default/zramswap` khỏi gói. Trong `DEBIAN/postinst`, sửa thẳng file của `zram-tools`:
-  đặt `ALGO=zstd` và `PERCENT=25` (sửa dòng có sẵn, kể cả dòng đang bị comment `#ALGO=`; chưa có thì thêm vào cuối).
-  `Depends: zram-tools` đã đảm bảo file có trước khi postinst chạy. Chạy lại nhiều lần phải ra cùng kết quả.
-- Kiểm tra các file còn lại của `vdtos-base` không thuộc gói Debian nào khác (tra https://packages.debian.org/ phần
-  "Search the contents of packages", suite trixie). File nào bị trùng thì xử lý cùng kiểu trên.
-- Test: `test_packaging.sh` bỏ `./etc/default/zramswap` khỏi danh sách và kiểm tra gói **không** chứa nó; thêm test cho đoạn
-  sửa zramswap (tách thành hàm, chạy trên file tạm có dòng `#ALGO=lz4` và `#PERCENT=50`, chạy hai lần, kết quả đúng một dòng mỗi biến).
-Push lên `anti/apt-repo` là xong; job `unit`, `iso` và `smoke` phải xanh.
+**Giao diện hiện đại: Task 8 trong spec** (branch `anti/modern-ui`, tạo từ `main` **sau khi PR #28 đã gộp**).
+Đọc Task 8 trong `docs/superpowers/specs/2026-11-27-vdtos-design.md` rồi làm đúng như ở đó. Bản thiết kế đã được người dùng duyệt.
+- Mọi file mới nằm trong `packaging/vdtos-base/` (theo đúng đường dẫn cài đặt), thêm gói vào `Depends` trong `packaging/build-debs.sh`.
+- Chuyển `packaging/vdtos-base/etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml` sang `etc/xdg/vdtos/...` bằng `git mv`.
+- Panel `default.xml`: id plugin phải duy nhất, mỗi plugin có `<property name="plugin-N" type="string" value="<tên>"/>`.
+  Tên plugin: `whiskermenu`, `separator` (expand=true), `clock`, `systray`, `pulseaudio`, `power-manager-plugin`,
+  `actions`, `docklike`. Kiểm tra tên bằng thư mục `/usr/share/xfce4/panel/plugins/*.desktop` của trixie.
+- Hình nền SVG tự vẽ, viết tay bằng XML (gradient + chữ), < 50KB.
+- Sửa kèm (nhỏ): `apt/build-repo.sh` đang sinh `dists/vdtos/Release` bằng `apt-ftparchive release dists/vdtos > dists/vdtos/Release`,
+  nên file `Release` tự liệt kê chính nó. Ghi ra file tạm ngoài `dists/vdtos` rồi `mv` vào.
+- Test (`tests/test_packaging.sh` hoặc file mới `tests/test_ui.sh`):
+  - `vdtos-base` chứa đủ: `xsettings.xml`, `xfwm4.xml`, `xfce4-desktop.xml`, `panel/default.xml` dưới `/etc/xdg/vdtos/`,
+    `/etc/X11/Xsession.d/55vdtos-xdg`, `/etc/lightdm/lightdm-gtk-greeter.conf.d/50-vdtos.conf`, `/usr/share/backgrounds/vdtos/default.svg`.
+  - Mọi file `.xml` và `.svg` parse được (`python3 -c 'import xml.dom.minidom,sys; xml.dom.minidom.parse(sys.argv[1])'`).
+  - `xsettings.xml` có `Materia-dark-compact`, `Papirus-Dark`, `Inter 10`; `xfwm4.xml` có `use_compositing` = true.
+  - `Depends` của `vdtos-base` có đủ 6 gói mới; `test_packages.sh` đã tra tên gói, nên thêm 6 gói đó vào một file
+    `live/config/package-lists/ui.list.chroot` để CI kiểm chúng có trong trixie.
+  - NOTICE.md cập nhật như Task 8.
+Push xong là xong; `unit`, `iso`, `smoke` phải xanh (smoke vẫn kiểm RAM < 700MB khi đã bật compositor).
