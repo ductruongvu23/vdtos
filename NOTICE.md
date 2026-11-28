@@ -18,6 +18,10 @@ Văn bản giấy phép đầy đủ của từng gói nằm trong ISO, ở `/us
 | Userspace Debian (live-boot, systemd, Xorg, XFCE, LightDM, NetworkManager, PipeWire, …) | Kho `main` của Debian | Nhiều giấy phép tự do (GPL, LGPL, MIT, BSD, …) đạt chuẩn DFSG | |
 | Firefox ESR | Gói `firefox-esr` của Debian | MPL-2.0 | Dùng nguyên gói Debian, không sửa; tên và logo Firefox theo chính sách thương hiệu của Mozilla |
 | Font Noto | Gói `fonts-noto-core` | SIL Open Font License 1.1 | |
+| Theme Materia | Gói `materia-gtk-theme` | GPL-2.0 | |
+| Bộ icon Papirus | Gói `papirus-icon-theme` | GPL-3.0 | |
+| Font Inter, JetBrains Mono | Gói `fonts-inter`, `fonts-jetbrains-mono` | SIL Open Font License 1.1 | |
+| Plugin XFCE (`whiskermenu`, `docklike`) | Gói `xfce4-whiskermenu-plugin`, `xfce4-docklike-plugin` | GPL-2.0+ | |
 | Debian Installer, logo Debian | Debian | GPL / Debian Open Use Logo License | |
 | `intel-microcode` | Kho `non-free-firmware` | Giấy phép riêng của Intel: **không phải mã nguồn mở**, cho phép phân phối lại nguyên bản | |
 | `firmware-misc-nonfree`, `firmware-realtek`, `firmware-iwlwifi`, `firmware-atheros`, `firmware-brcm80211`, `firmware-libertas`, `firmware-mediatek` | Kho `non-free-firmware` | Giấy phép riêng của từng hãng: **không phải mã nguồn mở**, cho phép phân phối lại nguyên bản | Cần cho Wi-Fi, mạng và GPU trên máy thật |

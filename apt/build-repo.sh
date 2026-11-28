@@ -36,6 +36,8 @@ main() {
     apt-ftparchive packages pool/main > dists/vdtos/main/binary-amd64/Packages
     gzip -9c dists/vdtos/main/binary-amd64/Packages > dists/vdtos/main/binary-amd64/Packages.gz
 
+    local release_tmp
+    release_tmp="$(mktemp)"
     apt-ftparchive \
       -o APT::FTPArchive::Release::Origin=VDTOS \
       -o APT::FTPArchive::Release::Label=VDTOS \
@@ -43,7 +45,8 @@ main() {
       -o APT::FTPArchive::Release::Codename=vdtos \
       -o APT::FTPArchive::Release::Architectures=amd64 \
       -o APT::FTPArchive::Release::Components=main \
-      release dists/vdtos > dists/vdtos/Release
+      release dists/vdtos > "$release_tmp"
+    mv "$release_tmp" dists/vdtos/Release
 
     gpg --batch --yes --pinentry-mode loopback -u "$APT_GPG_KEY_ID" \
       --clearsign -o dists/vdtos/InRelease dists/vdtos/Release
