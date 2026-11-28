@@ -64,6 +64,8 @@ assert_eq "Windows Registry Editor Version 5.00" "$(head -n 1 "$dark_reg")" "dar
 assert_eq "Windows Registry Editor Version 5.00" "$(head -n 1 "$light_reg")" "light.reg header"
 grep -qF '"MS Shell Dlg"="Inter"' "$dark_reg" || { echo "FAIL: dark.reg missing Inter font substitute" >&2; exit 1; }
 grep -qF '"Decorated"="Y"' "$dark_reg" || { echo "FAIL: dark.reg missing Decorated=Y" >&2; exit 1; }
+grep -qF '"ThemeActive"="0"' "$dark_reg" || { echo "FAIL: dark.reg missing ThemeActive=0" >&2; exit 1; }
+grep -qF '"ThemeActive"="1"' "$light_reg" || { echo "FAIL: light.reg missing ThemeActive=1" >&2; exit 1; }
 
 # Validate mimeapps.list
 mimeapps="$ROOT_DIR/packaging/vdtos-base/etc/xdg/vdtos/mimeapps.list"

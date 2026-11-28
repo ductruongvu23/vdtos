@@ -32,3 +32,6 @@ Windows Registry Editor Version 5.00
 "Window"="255 255 255"
 "WindowFrame"="0 0 0"
 "WindowText"="0 0 0"
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ThemeManager]
+"ThemeActive"="1"
