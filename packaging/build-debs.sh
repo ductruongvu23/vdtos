@@ -47,7 +47,7 @@ Version: ${version}
 Section: metapackages
 Priority: optional
 Architecture: all
-Depends: linux-image-vdtos, zram-tools, orchis-gtk-theme, papirus-icon-theme, fonts-inter, fonts-jetbrains-mono, xfce4-whiskermenu-plugin, xfce4-docklike-plugin, librsvg2-common
+Depends: linux-image-vdtos, zram-tools, orchis-gtk-theme, papirus-icon-theme, fonts-inter, fonts-jetbrains-mono, xfce4-whiskermenu-plugin, xfce4-docklike-plugin, xfce4-power-manager-plugins, xfce4-pulseaudio-plugin, librsvg2-common
 Maintainer: VDTOS <vdtos@example.invalid>
 Description: VDTOS base configuration, tuning, and apt repository
 EOF

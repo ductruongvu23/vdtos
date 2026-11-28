@@ -54,7 +54,9 @@ for pkg in \
   fonts-inter \
   fonts-jetbrains-mono \
   xfce4-whiskermenu-plugin \
-  xfce4-docklike-plugin; do
+  xfce4-docklike-plugin \
+  xfce4-power-manager-plugins \
+  xfce4-pulseaudio-plugin; do
   if ! grep -qwF "$pkg" <<< "$deps"; then
     echo "FAIL: vdtos-base Depends missing $pkg (got: $deps)" >&2
     exit 1
@@ -73,6 +75,28 @@ grep -qF 'Inter 10' "$xsettings" || { echo "FAIL: xsettings missing Inter 10" >&
 
 xfwm4="$ROOT_DIR/packaging/vdtos-base/etc/xdg/vdtos/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml"
 grep -qF 'name="use_compositing" type="bool" value="true"' "$xfwm4" || { echo "FAIL: xfwm4 missing use_compositing=true" >&2; exit 1; }
+
+panel_xml="$ROOT_DIR/packaging/vdtos-base/etc/xdg/vdtos/xfce4/panel/default.xml"
+python3 - "$panel_xml" <<'PY'
+import sys, xml.etree.ElementTree as ET
+tree = ET.parse(sys.argv[1])
+p2 = tree.find(".//property[@name='panel-2']")
+assert p2 is not None, "panel-2 missing"
+ah = p2.find("./property[@name='autohide-behavior']")
+assert ah is not None and ah.attrib.get("value") == "0", "panel-2 autohide-behavior must be 0"
+PY
+
+for rc_rel in \
+  ./etc/xdg/vdtos/xfce4/panel/docklike-9.rc \
+  ./etc/skel/.config/xfce4/panel/docklike-9.rc; do
+  grep -qF "$rc_rel" <<< "$contents" || { echo "FAIL: $base_deb missing $rc_rel" >&2; exit 1; }
+done
+
+docklike_rc="$ROOT_DIR/packaging/vdtos-base/etc/xdg/vdtos/xfce4/panel/docklike-9.rc"
+assert_eq "[user]" "$(head -n 1 "$docklike_rc")" "docklike-9.rc first line must be [user]"
+for app in firefox-esr.desktop thunar.desktop xfce4-terminal.desktop org.xfce.mousepad.desktop; do
+  grep -qF "/usr/share/applications/$app" "$docklike_rc" || { echo "FAIL: docklike-9.rc missing /usr/share/applications/$app" >&2; exit 1; }
+done
 
 svg="$ROOT_DIR/packaging/vdtos-base/usr/share/backgrounds/vdtos/default.svg"
 svg_size="$(wc -c < "$svg")"
