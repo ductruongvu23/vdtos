@@ -211,8 +211,12 @@ jobs:
           gpg --dearmor < apt/vdtos-archive-keyring.asc > "$RUNNER_TEMP/vdtos.gpg"
           gpgv --keyring "$RUNNER_TEMP/vdtos.gpg" site/dists/vdtos/InRelease
           gh release upload "$GITHUB_REF_NAME" debs/vdtos-base_*.deb debs/linux-image-vdtos_*.deb --repo "$GITHUB_REPOSITORY" --clobber
+      # Per-attempt name: a re-run would otherwise see two "github-pages" artifacts and fail.
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site
+          name: github-pages-${{ github.run_attempt }}
       - id: deploy
         uses: actions/deploy-pages@v4
+        with:
+          artifact_name: github-pages-${{ github.run_attempt }}
