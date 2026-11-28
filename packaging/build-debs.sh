@@ -39,7 +39,7 @@ main() {
   local base_dir="$tmp/vdtos-base"
   mkdir -p "$base_dir"
   cp -a "$script_dir/vdtos-base/." "$base_dir/"
-  chmod 0755 "$base_dir/DEBIAN/postinst" "$base_dir/usr/local/bin/vdtos-report" "$base_dir/usr/bin/vdtos-wine"
+  chmod 0755 "$base_dir/DEBIAN/postinst" "$base_dir/usr/local/bin/vdtos-report" "$base_dir/usr/bin/vdtos-wine" "$base_dir/usr/bin/vdtos-wine-settings"
 
   cat > "$base_dir/DEBIAN/control" <<EOF
 Package: vdtos-base

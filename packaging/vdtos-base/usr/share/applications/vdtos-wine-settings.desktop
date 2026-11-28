@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Tinh chỉnh Wine
+Comment=Cấu hình giao diện, DPI và phiên bản Windows cho Wine
+Exec=vdtos-wine-settings
+Icon=wine
+Terminal=false
+Categories=Settings;System;
