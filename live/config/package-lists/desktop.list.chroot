@@ -4,3 +4,4 @@ xfce4 xfce4-terminal thunar mousepad lightdm lightdm-gtk-greeter
 network-manager-gnome pipewire-audio wireplumber pavucontrol
 firefox-esr fonts-noto-core zram-tools intel-microcode
 firmware-misc-nonfree firmware-realtek firmware-iwlwifi
+vdtos-base linux-image-vdtos
