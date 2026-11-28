@@ -26,6 +26,7 @@ Các firmware non-free được phép phân phối lại đúng như Debian đan
 giữ nguyên file và kèm giấy phép (đã có trong `/usr/share/doc/<gói>/copyright`). Không được sửa đổi hay dịch ngược chúng.
 
 ## Mã nguồn tương ứng (GPL)
-- Kernel: tarball [linux-6.18.65.tar.xz](https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.18.65.tar.xz) không vá,
-  cấu hình được tạo lại bằng `make kernel` trong repo này.
+- Kernel: mỗi GitHub Release đính kèm đúng mã nguồn đã dùng: `linux-X.Y.Z.tar.xz` (tarball gốc kernel.org, không vá),
+  chữ ký `linux-X.Y.Z.tar.sign`, file cấu hình `config-X.Y.Z-vdtos` và gói `linux-image-*.deb` đã build.
+  Build lại: giải nén tarball, chép file config thành `.config`, chạy `make olddefconfig && make bindeb-pkg`.
 - Các gói Debian: mã nguồn đúng phiên bản có ở <https://sources.debian.org> và <https://snapshot.debian.org>.
