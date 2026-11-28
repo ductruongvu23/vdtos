@@ -11,6 +11,7 @@ main() {
   script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
   root_dir="$(cd "$script_dir/.." && pwd)"
   version="${1#v}"
+  version="${version:-0.1.0}"
   kernel_deb="$2"
   out_dir="$3"
 
@@ -46,7 +47,7 @@ Version: ${version}
 Section: metapackages
 Priority: optional
 Architecture: all
-Depends: linux-image-vdtos, zram-tools
+Depends: linux-image-vdtos, zram-tools, orchis-gtk-theme, papirus-icon-theme, fonts-inter, fonts-jetbrains-mono, xfce4-whiskermenu-plugin, xfce4-docklike-plugin
 Maintainer: VDTOS <vdtos@example.invalid>
 Description: VDTOS base configuration, tuning, and apt repository
 EOF
