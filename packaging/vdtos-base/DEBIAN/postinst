@@ -2,3 +2,4 @@
 set -euo pipefail
 
 systemctl enable vdtos-report.service
+sysctl --system || true
