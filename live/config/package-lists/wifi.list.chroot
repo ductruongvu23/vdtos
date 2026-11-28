@@ -1,0 +1,2 @@
+wpasupplicant iw rfkill wireless-regdb
+firmware-atheros firmware-brcm80211 firmware-libertas firmware-mediatek
