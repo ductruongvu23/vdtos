@@ -162,6 +162,55 @@ Máy thật boot được nhưng menu mạng chỉ có Ethernet. Nguyên nhân d
   `linux-image-*-vdtos`).
 - NOTICE.md thêm các gói firmware mới vào dòng firmware non-free.
 
+## Task 10: Wine chạy app `.exe` không cần cấu hình (thêm 2026-11-28)
+Bấm đúp `.exe`/`.msi` trong Thunar là chạy được. Lần đầu tự tạo `~/.wine`. App cài xong tự có biểu tượng trong menu.
+Cửa sổ app Windows dùng viền của xfwm4 và có màu, font, DPI giống phần còn lại của OS.
+Dùng Wine đóng gói sẵn của trixie, không tự build.
+- **32-bit:** trước tiên kiểm tra xem gói `wine`/`wine64` của trixie có chạy được app 32-bit theo kiểu WoW64 mới không,
+  tức là không cần `wine32:i386`. Nếu được thì dùng cách này (ISO tăng khoảng 250MB). Nếu không thì thêm kiến trúc i386 và gói `wine32:i386`.
+  Kiểm tra cách live-build thêm kiến trúc phụ cho đúng trước khi làm. Ghi lựa chọn và lý do vào commit message.
+- **Gói:** Wine, `fonts-wine`, cùng các gói chỉ là Recommends mà Wine cần để chạy được (do build với `--apt-recommends false`),
+  và `python3-gi gir1.2-gtk-3.0` cho app tinh chỉnh. Thêm tất cả vào `live/config/package-lists/wine.list.chroot`
+  và vào `Depends` của `vdtos-base`.
+- **Hạ tầng Wine** (`packaging/vdtos-base/`):
+  - `/usr/bin/vdtos-wine` có các lệnh con sau. Đây là interface mà app tinh chỉnh sẽ gọi:
+    - `vdtos-wine init`: nếu `$WINEPREFIX` (mặc định `~/.wine`) chưa có thì chạy `wineboot -i` với
+      `WINEDLLOVERRIDES="mscoree,mshtml="` để không bật hộp thoại cài Mono/Gecko, rồi chạy `apply-theme dark`. Có rồi thì không làm gì.
+    - `vdtos-wine run <file>`: chạy `init`, rồi `wine start /unix <file>`. Dùng cho cả `.exe` và `.msi`.
+    - `vdtos-wine apply-theme dark|light`: nhập `/usr/share/vdtos/wine/<dark|light>.reg` bằng `wine regedit`.
+    - `vdtos-wine set-dpi <96|120|144>`: ghi `HKCU\Control Panel\Desktop\LogPixels`.
+    - `vdtos-wine reset`: đổi tên `~/.wine` thành `~/.wine.bak-<ngày giờ>` rồi chạy `init`. Không xóa dữ liệu cũ.
+    - Mọi lệnh con đều in lỗi ra stderr và trả exit code khác 0 khi thất bại. Có cờ `--dry-run` để chỉ in ra các lệnh sẽ chạy (dùng cho test).
+  - `/usr/share/vdtos/wine/dark.reg`: bảng màu `HKCU\Control Panel\Colors` khớp Orchis-Dark. Lấy màu nền, màu chữ và
+    màu nhấn từ `/usr/share/themes/Orchis-Dark-Compact/gtk-3.0/gtk.css`. Kèm font: thay `MS Shell Dlg`, `Tahoma`, `Segoe UI`
+    bằng Inter qua `HKLM\Software\Microsoft\Windows NT\CurrentVersion\FontSubstitutes`, và đặt
+    `HKCU\Software\Wine\X11 Driver` `Decorated=Y` để xfwm4 vẽ viền cửa sổ.
+  - `/usr/share/vdtos/wine/light.reg`: màu mặc định của Wine, để quay lại.
+  - Liên kết mở file: `/usr/share/applications/vdtos-wine-run.desktop` (`Exec=vdtos-wine run %f`, `NoDisplay=true`,
+    MimeType gồm `application/x-ms-dos-executable;application/x-msi;application/x-ms-shortcut;`). Đặt làm mặc định qua
+    `/etc/xdg/vdtos/mimeapps.list`.
+  - Tối ưu cho máy yếu: `WINEDEBUG=-all` đặt trong `/etc/X11/Xsession.d/` (file mới, không sửa `55vdtos-xdg`);
+    giữ renderer OpenGL mặc định. Intel HD 3000 không có Vulkan nên không dùng DXVK.
+- **App tinh chỉnh `vdtos-wine-settings`** (Python 3 + GTK 3, một file, theme lấy theo hệ thống):
+  - `/usr/bin/vdtos-wine-settings` và `/usr/share/applications/vdtos-wine-settings.desktop`
+    (tên hiện trong menu: "Tinh chỉnh Wine", icon `wine`, Categories `Settings;System;`).
+  - Phần trên cùng hiển thị trạng thái: phiên bản Wine (`wine --version`), đường dẫn prefix, prefix đã tạo hay chưa.
+  - Các tùy chỉnh:
+    - giao diện app Windows Tối/Sáng (gọi `vdtos-wine apply-theme`);
+    - cỡ chữ/DPI 100%/125%/150% (gọi `vdtos-wine set-dpi 96|120|144`);
+    - phiên bản Windows giả lập Windows 10/7/XP (gọi `winecfg -v win10|win7|winxp`).
+  - Các nút: "Cấu hình nâng cao" (`winecfg`), "Mở ổ C:" (mở `$WINEPREFIX/drive_c` bằng `xdg-open`),
+    "Gỡ cài đặt app" (`wine uninstaller`), "Đặt lại Wine" (hỏi xác nhận rồi gọi `vdtos-wine reset`).
+  - Mọi lệnh chạy ở luồng nền để giao diện không bị treo, lỗi thì hiện hộp thoại báo lỗi. Có cờ `--dry-run` để in lệnh thay vì chạy.
+  - Chữ trên giao diện bằng tiếng Việt.
+- **Test:**
+  - `tests/test_wine.sh`: danh sách gói, `Depends`, file `.desktop` hợp lệ (`desktop-file-validate` nếu có), `.reg` bắt đầu
+    bằng `Windows Registry Editor Version 5.00`, `mimeapps.list` trỏ đúng, và `vdtos-wine --dry-run` in đúng lệnh cho từng lệnh con.
+  - `tests/test_wine_settings.sh`: `python3 -m py_compile`, `vdtos-wine-settings --dry-run --self-test` in ra các lệnh
+    sẽ gọi cho từng tùy chỉnh mà không cần màn hình.
+- NOTICE.md thêm Wine (LGPL-2.1+). Không đưa Microsoft corefonts hay winetricks vào ISO.
+- Smoke test vẫn kiểm RAM nhàn rỗi < 700MB, vì Wine không chạy lúc khởi động.
+
 ## Kiểm chứng
 1. Job `kernel` trên CI xanh, artifact `kernel-deb` có file `.deb` chứa `boot/vmlinuz-*-vdtos`.
 2. Job `iso` xanh, và ISO chứa `live/vmlinuz-*-vdtos`. Đây là chỗ rủi ro nhất: chưa chắc
