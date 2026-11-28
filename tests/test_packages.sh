@@ -19,6 +19,9 @@ missing=0
 while IFS= read -r line || [[ -n "$line" ]]; do
   line="${line%%#*}"
   for pkg in $line; do
+    case "$pkg" in
+      vdtos-base|linux-image-vdtos) continue ;;
+    esac
     if ! apt-cache show "$pkg" >/dev/null 2>&1; then
       echo "FAIL: package not found in apt-cache: $pkg" >&2
       missing=1

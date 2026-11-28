@@ -6,6 +6,11 @@ ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 source "$ROOT_DIR/tests/lib.sh"
 
+if ! command -v apt-ftparchive >/dev/null 2>&1; then
+  echo "SKIP: apt-ftparchive not found; skipping apt repo test"
+  exit 0
+fi
+
 tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
 
