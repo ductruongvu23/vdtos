@@ -49,7 +49,7 @@ done
 
 deps="$(dpkg-deb -f "$base_deb" Depends)"
 for pkg in \
-  arc-theme \
+  orchis-gtk-theme \
   papirus-icon-theme \
   fonts-inter \
   fonts-jetbrains-mono \
@@ -67,7 +67,7 @@ while IFS= read -r -d '' f; do
 done < <(find "$ROOT_DIR/packaging/vdtos-base" \( -name '*.xml' -o -name '*.svg' \) -print0)
 
 xsettings="$ROOT_DIR/packaging/vdtos-base/etc/xdg/vdtos/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml"
-grep -qF 'Arc-Dark' "$xsettings" || { echo "FAIL: xsettings missing Arc-Dark" >&2; exit 1; }
+grep -qF 'Orchis-Dark-Compact' "$xsettings" || { echo "FAIL: xsettings missing Orchis-Dark-Compact" >&2; exit 1; }
 grep -qF 'Papirus-Dark' "$xsettings" || { echo "FAIL: xsettings missing Papirus-Dark" >&2; exit 1; }
 grep -qF 'Inter 10' "$xsettings" || { echo "FAIL: xsettings missing Inter 10" >&2; exit 1; }
 

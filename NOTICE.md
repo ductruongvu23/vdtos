@@ -18,7 +18,7 @@ Văn bản giấy phép đầy đủ của từng gói nằm trong ISO, ở `/us
 | Userspace Debian (live-boot, systemd, Xorg, XFCE, LightDM, NetworkManager, PipeWire, …) | Kho `main` của Debian | Nhiều giấy phép tự do (GPL, LGPL, MIT, BSD, …) đạt chuẩn DFSG | |
 | Firefox ESR | Gói `firefox-esr` của Debian | MPL-2.0 | Dùng nguyên gói Debian, không sửa; tên và logo Firefox theo chính sách thương hiệu của Mozilla |
 | Font Noto | Gói `fonts-noto-core` | SIL Open Font License 1.1 | |
-| Theme Arc | Gói `arc-theme` | GPL-3.0 | |
+| Theme Orchis | Gói `orchis-gtk-theme` | GPL-3.0 | |
 | Bộ icon Papirus | Gói `papirus-icon-theme` | GPL-3.0 | |
 | Font Inter, JetBrains Mono | Gói `fonts-inter`, `fonts-jetbrains-mono` | SIL Open Font License 1.1 | |
 | Plugin XFCE (`whiskermenu`, `docklike`) | Gói `xfce4-whiskermenu-plugin`, `xfce4-docklike-plugin` | GPL-2.0+ | |
