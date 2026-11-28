@@ -130,17 +130,18 @@ Máy đã cài nhận kernel mới và tinh chỉnh mới của VDTOS bằng `su
 - Máy đã cài từ v0.1.0 (chưa có `vdtos-base`): chỉ cần một lần tải `vdtos-base_*.deb` từ Release rồi `sudo apt install ./vdtos-base_*.deb`.
 
 ## Task 8: Giao diện hiện đại (thêm 2026-11-28)
+Ghi chú: Materia không có trong trixie, thay bằng Orchis (cùng tác giả, cùng phong cách Material).
 Nhìn hiện đại nhưng vẫn giữ RAM nhàn rỗi < 700MB (smoke test vẫn kiểm). Toàn bộ nằm trong gói `vdtos-base`, để máy đã cài
 nhận qua `apt full-upgrade`.
-- Gói thêm vào `Depends` của `vdtos-base`: `materia-gtk-theme papirus-icon-theme fonts-inter fonts-jetbrains-mono
+- Gói thêm vào `Depends` của `vdtos-base`: `orchis-gtk-theme papirus-icon-theme fonts-inter fonts-jetbrains-mono
   xfce4-whiskermenu-plugin xfce4-docklike-plugin`. Trước khi dùng tên nào, kiểm tra nó có trong trixie (`apt-cache show`).
 - Không đè file của gói Debian nào: mọi cấu hình đặt dưới `/etc/xdg/vdtos/` (cùng cấu trúc với `/etc/xdg/`), và
   `/etc/X11/Xsession.d/55vdtos-xdg` đặt `XDG_CONFIG_DIRS=/etc/xdg/vdtos:${XDG_CONFIG_DIRS:-/etc/xdg}`.
   `xfwm4.xml` hiện có chuyển sang đây.
 - xfconf mặc định (`/etc/xdg/vdtos/xfce4/xfconf/xfce-perchannel-xml/`):
-  - `xsettings.xml`: theme `Materia-dark-compact`, icon `Papirus-Dark`, font `Inter 10`, font mono `JetBrains Mono 10`,
+  - `xsettings.xml`: theme `Orchis-Dark-Compact`, icon `Papirus-Dark`, font `Inter 10`, font mono `JetBrains Mono 10`,
     bật antialias + hinting slight.
-  - `xfwm4.xml`: theme `Materia-dark-compact`, `use_compositing=true`, bóng đổ dưới cửa sổ thường bật, bóng đổ dock tắt,
+  - `xfwm4.xml`: theme `Orchis-Dark-Compact`, `use_compositing=true`, bóng đổ dưới cửa sổ thường bật, bóng đổ dock tắt,
     mọi độ trong suốt (`frame_opacity`, `inactive_opacity`, `move_opacity`, `resize_opacity`, `popup_opacity`) = 100.
   - `xfce4-desktop.xml`: hình nền `/usr/share/backgrounds/vdtos/default.svg`, chế độ zoom; tắt icon trên desktop.
   - Panel: `/etc/xdg/vdtos/xfce4/panel/default.xml`. Thanh trên cao 28px: whiskermenu trái, separator giãn, đồng hồ giữa
@@ -150,7 +151,7 @@ nhận qua `apt full-upgrade`.
   icon, font, hình nền.
 - Hình nền: `/usr/share/backgrounds/vdtos/default.svg`, tự vẽ (dải gradient tối + chữ VDTOS mờ), giấy phép MIT như repo.
   Không lấy ảnh từ nơi khác.
-- NOTICE.md thêm: Materia (GPL-2.0), Papirus (GPL-3.0), Inter và JetBrains Mono (OFL-1.1), các plugin XFCE (GPL-2.0+).
+- NOTICE.md thêm: Orchis (GPL-3.0), Papirus (GPL-3.0), Inter và JetBrains Mono (OFL-1.1), các plugin XFCE (GPL-2.0+).
 
 ## Task 9: Wi-Fi (thêm 2026-11-28)
 Máy thật boot được nhưng menu mạng chỉ có Ethernet. Nguyên nhân dự đoán: `--apt-recommends false` làm thiếu `wpasupplicant`
