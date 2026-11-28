@@ -1,3 +1,4 @@
-pinned=firefox-esr.desktop;thunar.desktop;xfce4-terminal.desktop;org.xfce.mousepad.desktop;
+[user]
+pinned=/usr/share/applications/firefox-esr.desktop;/usr/share/applications/thunar.desktop;/usr/share/applications/xfce4-terminal.desktop;/usr/share/applications/org.xfce.mousepad.desktop;
 showPreviews=true
 indicatorStyle=1

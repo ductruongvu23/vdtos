@@ -93,8 +93,9 @@ for rc_rel in \
 done
 
 docklike_rc="$ROOT_DIR/packaging/vdtos-base/etc/xdg/vdtos/xfce4/panel/docklike-9.rc"
+assert_eq "[user]" "$(head -n 1 "$docklike_rc")" "docklike-9.rc first line must be [user]"
 for app in firefox-esr.desktop thunar.desktop xfce4-terminal.desktop org.xfce.mousepad.desktop; do
-  grep -qF "$app" "$docklike_rc" || { echo "FAIL: docklike-9.rc missing $app" >&2; exit 1; }
+  grep -qF "/usr/share/applications/$app" "$docklike_rc" || { echo "FAIL: docklike-9.rc missing /usr/share/applications/$app" >&2; exit 1; }
 done
 
 svg="$ROOT_DIR/packaging/vdtos-base/usr/share/backgrounds/vdtos/default.svg"
