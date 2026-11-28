@@ -1,0 +1,43 @@
+name: apt-bootstrap
+
+# One-off: publish an empty signed apt repo so vdtos.sources resolves before the first tagged release.
+# The tag-driven `apt` job in build.yml replaces it with real packages.
+on:
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build empty signed repo
+        env:
+          APT_GPG_PRIVATE_KEY: ${{ secrets.APT_GPG_PRIVATE_KEY }}
+        run: |
+          sudo apt-get update && sudo apt-get install -y --no-install-recommends apt-utils
+          export GNUPGHOME="$(mktemp -d)"
+          printf '%s\n' "$APT_GPG_PRIVATE_KEY" | gpg --batch --import
+          key="$(gpg --list-secret-keys --with-colons | awk -F: '/^fpr/{print $10; exit}')"
+          mkdir -p site/dists/vdtos/main/binary-amd64 site/pool/main
+          : > site/dists/vdtos/main/binary-amd64/Packages
+          gzip -9c site/dists/vdtos/main/binary-amd64/Packages > site/dists/vdtos/main/binary-amd64/Packages.gz
+          cd site
+          apt-ftparchive -o APT::FTPArchive::Release::Origin=VDTOS -o APT::FTPArchive::Release::Label=VDTOS \
+            -o APT::FTPArchive::Release::Suite=vdtos -o APT::FTPArchive::Release::Codename=vdtos \
+            -o APT::FTPArchive::Release::Architectures=amd64 -o APT::FTPArchive::Release::Components=main \
+            release dists/vdtos > dists/vdtos/Release
+          gpg --batch --yes -u "$key" --clearsign -o dists/vdtos/InRelease dists/vdtos/Release
+          gpg --batch --yes -u "$key" -abs -o dists/vdtos/Release.gpg dists/vdtos/Release
+          gpg --dearmor < ../apt/vdtos-archive-keyring.asc > "$RUNNER_TEMP/vdtos.gpg"
+          gpgv --keyring "$RUNNER_TEMP/vdtos.gpg" dists/vdtos/InRelease
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: deploy
+        uses: actions/deploy-pages@v4
