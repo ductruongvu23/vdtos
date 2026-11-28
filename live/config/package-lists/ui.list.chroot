@@ -1,2 +1,2 @@
 orchis-gtk-theme papirus-icon-theme fonts-inter fonts-jetbrains-mono
-xfce4-whiskermenu-plugin xfce4-docklike-plugin
+xfce4-whiskermenu-plugin xfce4-docklike-plugin librsvg2-common
