@@ -33,4 +33,8 @@ Claude là người điều phối. Mỗi khi bạn xong việc hoặc được 
 4. Làm trong thư mục riêng của mình (Anti: `C:\Users\VDT\Documents\New_os`, Codex: `C:\Users\VDT\Documents\New_os-codex` qua `git worktree`), không đổi branch trong thư mục của agent kia.
 
 ## Việc hiện tại
-Chờ. Task 1–4 của plan đã xong: smoke test trên `main` xanh (run 46072258141: boot 9.082 s, RAM 384 MB). Task 5 là kiểm tra bằng tay, do người dùng làm.
+**Wi-Fi: Task 9 trong spec** (branch `codex/wifi`, tạo từ `main`, làm trong `C:\Users\VDT\Documents\New_os-codex`).
+Đọc Task 9 trong `docs/superpowers/specs/2026-11-27-vdtos-design.md` rồi làm đúng ba việc ở đó:
+tạo `live/config/package-lists/wifi.list.chroot`, mở rộng `tests/test_packages.sh`, cập nhật NOTICE.md.
+Không sửa `desktop.list.chroot` (Anti đang sửa ở PR #28) và không sửa `.github/workflows/build.yml`.
+Push xong là xong; job `unit` phải xanh (test_packages tra từng gói bằng `apt-cache show` trong container trixie).
