@@ -30,4 +30,11 @@ Claude là người điều phối. Mỗi khi bạn xong việc hoặc được 
 4. Làm trong thư mục riêng của mình (Anti: `C:\Users\VDT\Documents\New_os`, Codex: `C:\Users\VDT\Documents\New_os-codex` qua `git worktree`), không đổi branch trong thư mục của agent kia.
 
 ## Việc hiện tại
-Chờ. Tài khoản live và hình nền (PR #41), dock và plugin (PR #43) đã gộp.
+**Wine: Task 10 trong spec, phần hạ tầng** (branch `anti/wine`, tạo từ `main`).
+Đọc Task 10 trong `docs/superpowers/specs/2026-11-27-vdtos-design.md`. Người dùng đã duyệt thiết kế.
+Bạn làm: chọn cách hỗ trợ 32-bit (WoW64 hay i386), `wine.list.chroot`, `Depends` của `vdtos-base` (kể cả `python3-gi gir1.2-gtk-3.0`
+cho app của Codex), `/usr/bin/vdtos-wine` với đúng các lệnh con và cờ `--dry-run` như spec, `dark.reg`/`light.reg`,
+`vdtos-wine-run.desktop`, `mimeapps.list`, file Xsession.d cho `WINEDEBUG`, `tests/test_wine.sh`, NOTICE.md.
+Codex làm song song app `vdtos-wine-settings`. Không đụng `usr/bin/vdtos-wine-settings`,
+`usr/share/applications/vdtos-wine-settings.desktop` và `tests/test_wine_settings.sh`.
+Push xong là xong; `unit`, `iso`, `smoke` phải xanh. Claude sẽ chạy ISO trong QEMU, bấm đúp thử một file `.exe` và chụp màn hình.

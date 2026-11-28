@@ -33,4 +33,15 @@ Claude là người điều phối. Mỗi khi bạn xong việc hoặc được 
 4. Làm trong thư mục riêng của mình (Anti: `C:\Users\VDT\Documents\New_os`, Codex: `C:\Users\VDT\Documents\New_os-codex` qua `git worktree`), không đổi branch trong thư mục của agent kia.
 
 ## Việc hiện tại
-Chờ. Task 9 (Wi-Fi) đã gộp ở PR #33.
+**App "Tinh chỉnh Wine": Task 10 trong spec, phần app** (branch `codex/wine-settings`, tạo từ `main`,
+làm trong `C:\Users\VDT\Documents\New_os-codex`).
+Đọc Task 10 trong `docs/superpowers/specs/2026-11-27-vdtos-design.md`, mục **App tinh chỉnh `vdtos-wine-settings`**.
+Người dùng đã duyệt thiết kế.
+Bạn chỉ tạo 3 file: `packaging/vdtos-base/usr/bin/vdtos-wine-settings` (Python 3 + GTK 3 qua `gi`, chmod +x, shebang `#!/usr/bin/env python3`),
+`packaging/vdtos-base/usr/share/applications/vdtos-wine-settings.desktop` và `tests/test_wine_settings.sh`.
+- App chỉ gọi lệnh ngoài: `vdtos-wine apply-theme|set-dpi|reset` (Anti đang viết, cứ code theo interface trong spec), `winecfg`,
+  `wine uninstaller`, `wine --version`, `xdg-open`. Không tự ghi registry.
+- `--dry-run --self-test`: không mở cửa sổ, in ra mỗi dòng một lệnh sẽ chạy cho từng tùy chỉnh, exit 0. Test dựa vào đây.
+- Không sửa `packaging/build-debs.sh`, `live/`, `tests/run.sh` (runner tự tìm `tests/test_*.sh`). Anti đã thêm
+  `python3-gi gir1.2-gtk-3.0` vào `Depends`.
+Push xong là xong; job `unit` phải xanh.
