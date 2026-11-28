@@ -30,22 +30,22 @@ Claude là người điều phối. Mỗi khi bạn xong việc hoặc được 
 4. Làm trong thư mục riêng của mình (Anti: `C:\Users\VDT\Documents\New_os`, Codex: `C:\Users\VDT\Documents\New_os-codex` qua `git worktree`), không đổi branch trong thư mục của agent kia.
 
 ## Việc hiện tại
-**Kho apt để cập nhật tại chỗ** (branch `anti/apt-repo`, tạo từ `main`). Đọc **Task 7** trong spec trước.
-Bạn làm:
-1. `packaging/build-debs.sh <version> <kernel-deb> <out-dir>`: build `vdtos-base_<version>_all.deb` và
-   `linux-image-vdtos_<X.Y.Z>_amd64.deb` bằng `dpkg-deb --build --root-owner-group` từ thư mục dựng tạm (không cần debhelper).
-   Lấy X.Y.Z bằng `dpkg-deb -f <kernel-deb> Version` bỏ đuôi `-N`. File của `vdtos-base` lấy từ `packaging/vdtos-base/`
-   (chuyển nguyên các file đang ở `live/config/includes.chroot/` sang đây bằng `git mv`, kèm `DEBIAN/postinst`).
-2. `apt/build-repo.sh <debs-dir> <out-dir>`: dựng `pool/main/` + `dists/vdtos/main/binary-amd64/Packages{,.gz}` +
-   `dists/vdtos/Release` bằng `apt-ftparchive`, rồi ký ra `InRelease` và `Release.gpg` bằng key trong keyring GPG hiện tại
-   (id lấy từ biến `APT_GPG_KEY_ID`). Thiếu biến hoặc ký lỗi thì exit 1.
-3. `live/`: bỏ `includes.chroot/` và hook 0100; `make iso` gọi `packaging/build-debs.sh` để thả hai gói vào `packages.chroot`
-   và thêm `vdtos-base linux-image-vdtos` vào package list. `live/auto/config` giữ `--linux-packages` như hiện tại.
-4. Test (thêm vào `tests/`, chạy qua `tests/run.sh`):
-   - `test_packaging.sh`: dùng một kernel .deb giả (dựng bằng dpkg-deb trong test). Kiểm tra `vdtos-base` chứa đủ các file cũ,
-     có keyring + `vdtos.sources`, `Depends` đúng; `linux-image-vdtos` có `Version` = X.Y.Z và `Depends: linux-image-X.Y.Z-vdtos`.
-   - `test_apt_repo.sh`: tạo key GPG tạm (`gpg --batch --quick-gen-key` trong `GNUPGHOME` tạm, không mật khẩu), dựng kho,
-     rồi `gpgv` kiểm `InRelease` qua được, và `Packages` có đủ hai gói. Thiếu `APT_GPG_KEY_ID` thì `build-repo.sh` phải fail.
-- Bỏ qua phần public key thật `apt/vdtos-archive-keyring.asc` và job CI `apt`: Claude làm (key và GitHub Pages cần người dùng
-  đồng ý). Trong `vdtos-base`, keyring lấy từ `apt/vdtos-archive-keyring.asc` nếu có; chưa có thì build vẫn chạy nhưng in WARN.
-- Không sửa `.github/workflows/build.yml`. Push xong là xong; job `unit` phải xanh và job `smoke` vẫn phải xanh (ISO đổi cách cài file).
+**Giao diện hiện đại: Task 8 trong spec** (branch `anti/modern-ui`, tạo từ `main` **sau khi PR #28 đã gộp**).
+Đọc Task 8 trong `docs/superpowers/specs/2026-11-27-vdtos-design.md` rồi làm đúng như ở đó. Bản thiết kế đã được người dùng duyệt.
+- Mọi file mới nằm trong `packaging/vdtos-base/` (theo đúng đường dẫn cài đặt), thêm gói vào `Depends` trong `packaging/build-debs.sh`.
+- Chuyển `packaging/vdtos-base/etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml` sang `etc/xdg/vdtos/...` bằng `git mv`.
+- Panel `default.xml`: id plugin phải duy nhất, mỗi plugin có `<property name="plugin-N" type="string" value="<tên>"/>`.
+  Tên plugin: `whiskermenu`, `separator` (expand=true), `clock`, `systray`, `pulseaudio`, `power-manager-plugin`,
+  `actions`, `docklike`. Kiểm tra tên bằng thư mục `/usr/share/xfce4/panel/plugins/*.desktop` của trixie.
+- Hình nền SVG tự vẽ, viết tay bằng XML (gradient + chữ), < 50KB.
+- Sửa kèm (nhỏ): `apt/build-repo.sh` đang sinh `dists/vdtos/Release` bằng `apt-ftparchive release dists/vdtos > dists/vdtos/Release`,
+  nên file `Release` tự liệt kê chính nó. Ghi ra file tạm ngoài `dists/vdtos` rồi `mv` vào.
+- Test (`tests/test_packaging.sh` hoặc file mới `tests/test_ui.sh`):
+  - `vdtos-base` chứa đủ: `xsettings.xml`, `xfwm4.xml`, `xfce4-desktop.xml`, `panel/default.xml` dưới `/etc/xdg/vdtos/`,
+    `/etc/X11/Xsession.d/55vdtos-xdg`, `/etc/lightdm/lightdm-gtk-greeter.conf.d/50-vdtos.conf`, `/usr/share/backgrounds/vdtos/default.svg`.
+  - Mọi file `.xml` và `.svg` parse được (`python3 -c 'import xml.dom.minidom,sys; xml.dom.minidom.parse(sys.argv[1])'`).
+  - `xsettings.xml` có `Materia-dark-compact`, `Papirus-Dark`, `Inter 10`; `xfwm4.xml` có `use_compositing` = true.
+  - `Depends` của `vdtos-base` có đủ 6 gói mới; `test_packages.sh` đã tra tên gói, nên thêm 6 gói đó vào một file
+    `live/config/package-lists/ui.list.chroot` để CI kiểm chúng có trong trixie.
+  - NOTICE.md cập nhật như Task 8.
+Push xong là xong; `unit`, `iso`, `smoke` phải xanh (smoke vẫn kiểm RAM < 700MB khi đã bật compositor).

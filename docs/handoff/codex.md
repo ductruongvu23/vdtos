@@ -33,4 +33,4 @@ Claude là người điều phối. Mỗi khi bạn xong việc hoặc được 
 4. Làm trong thư mục riêng của mình (Anti: `C:\Users\VDT\Documents\New_os`, Codex: `C:\Users\VDT\Documents\New_os-codex` qua `git worktree`), không đổi branch trong thư mục của agent kia.
 
 ## Việc hiện tại
-Chờ. Task 1–4 của plan đã xong: smoke test trên `main` xanh (run 46072258141: boot 9.082 s, RAM 384 MB). Task 5 là kiểm tra bằng tay, do người dùng làm.
+Chờ. Task 9 (Wi-Fi) đã gộp ở PR #33.

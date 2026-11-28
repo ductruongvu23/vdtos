@@ -129,6 +129,38 @@ Máy đã cài nhận kernel mới và tinh chỉnh mới của VDTOS bằng `su
   `APT_GPG_PRIVATE_KEY`, đẩy lên Pages. Public key nằm trong repo ở `apt/vdtos-archive-keyring.asc`.
 - Máy đã cài từ v0.1.0 (chưa có `vdtos-base`): chỉ cần một lần tải `vdtos-base_*.deb` từ Release rồi `sudo apt install ./vdtos-base_*.deb`.
 
+## Task 8: Giao diện hiện đại (thêm 2026-11-28)
+Nhìn hiện đại nhưng vẫn giữ RAM nhàn rỗi < 700MB (smoke test vẫn kiểm). Toàn bộ nằm trong gói `vdtos-base`, để máy đã cài
+nhận qua `apt full-upgrade`.
+- Gói thêm vào `Depends` của `vdtos-base`: `materia-gtk-theme papirus-icon-theme fonts-inter fonts-jetbrains-mono
+  xfce4-whiskermenu-plugin xfce4-docklike-plugin`. Trước khi dùng tên nào, kiểm tra nó có trong trixie (`apt-cache show`).
+- Không đè file của gói Debian nào: mọi cấu hình đặt dưới `/etc/xdg/vdtos/` (cùng cấu trúc với `/etc/xdg/`), và
+  `/etc/X11/Xsession.d/55vdtos-xdg` đặt `XDG_CONFIG_DIRS=/etc/xdg/vdtos:${XDG_CONFIG_DIRS:-/etc/xdg}`.
+  `xfwm4.xml` hiện có chuyển sang đây.
+- xfconf mặc định (`/etc/xdg/vdtos/xfce4/xfconf/xfce-perchannel-xml/`):
+  - `xsettings.xml`: theme `Materia-dark-compact`, icon `Papirus-Dark`, font `Inter 10`, font mono `JetBrains Mono 10`,
+    bật antialias + hinting slight.
+  - `xfwm4.xml`: theme `Materia-dark-compact`, `use_compositing=true`, bóng đổ dưới cửa sổ thường bật, bóng đổ dock tắt,
+    mọi độ trong suốt (`frame_opacity`, `inactive_opacity`, `move_opacity`, `resize_opacity`, `popup_opacity`) = 100.
+  - `xfce4-desktop.xml`: hình nền `/usr/share/backgrounds/vdtos/default.svg`, chế độ zoom; tắt icon trên desktop.
+  - Panel: `/etc/xdg/vdtos/xfce4/panel/default.xml`. Thanh trên cao 28px: whiskermenu trái, separator giãn, đồng hồ giữa
+    (định dạng `%a %d %b  %H:%M`), separator giãn, systray + pulseaudio/âm lượng + power-manager + nút thoát bên phải.
+    Dock dưới: panel giữa màn hình, tự co theo nội dung, cao 48px, chỉ có plugin docklike, tự ẩn thông minh (intellihide).
+- LightDM: `/etc/lightdm/lightdm-gtk-greeter.conf.d/50-vdtos.conf` (thư mục `.conf.d` không thuộc gói nào): cùng theme,
+  icon, font, hình nền.
+- Hình nền: `/usr/share/backgrounds/vdtos/default.svg`, tự vẽ (dải gradient tối + chữ VDTOS mờ), giấy phép MIT như repo.
+  Không lấy ảnh từ nơi khác.
+- NOTICE.md thêm: Materia (GPL-2.0), Papirus (GPL-3.0), Inter và JetBrains Mono (OFL-1.1), các plugin XFCE (GPL-2.0+).
+
+## Task 9: Wi-Fi (thêm 2026-11-28)
+Máy thật boot được nhưng menu mạng chỉ có Ethernet. Nguyên nhân dự đoán: `--apt-recommends false` làm thiếu `wpasupplicant`
+(NetworkManager cần nó để quét Wi-Fi), và thiếu firmware Atheros/Broadcom.
+- File danh sách mới `live/config/package-lists/wifi.list.chroot`:
+  `wpasupplicant iw rfkill wireless-regdb firmware-atheros firmware-brcm80211 firmware-libertas firmware-mediatek`.
+- `tests/test_packages.sh` kiểm tra mọi `*.list.chroot`, bỏ qua gói build trong repo (`vdtos-*`, `linux-image-vdtos`,
+  `linux-image-*-vdtos`).
+- NOTICE.md thêm các gói firmware mới vào dòng firmware non-free.
+
 ## Kiểm chứng
 1. Job `kernel` trên CI xanh, artifact `kernel-deb` có file `.deb` chứa `boot/vmlinuz-*-vdtos`.
 2. Job `iso` xanh, và ISO chứa `live/vmlinuz-*-vdtos`. Đây là chỗ rủi ro nhất: chưa chắc

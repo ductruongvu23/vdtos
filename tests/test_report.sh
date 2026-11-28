@@ -5,7 +5,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 source "$ROOT_DIR/tests/lib.sh"
-source "$ROOT_DIR/live/config/includes.chroot/usr/local/bin/vdtos-report"
+source "$ROOT_DIR/packaging/vdtos-base/usr/local/bin/vdtos-report"
 
 assert_eq "8.2" "$(boot_seconds "graphical.target reached after 8.2s in userspace.")" "boot_seconds seconds"
 assert_eq "64.512" "$(boot_seconds "graphical.target reached after 1min 4.512s in userspace.")" "boot_seconds min+s"

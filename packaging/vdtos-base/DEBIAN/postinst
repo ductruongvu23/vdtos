@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+configure_zramswap() {
+  local file="$1"
+  [[ -f "$file" ]] || : > "$file"
+
+  local tmp
+  tmp="$(mktemp)"
+  awk '
+    BEGIN { saw_algo = 0; saw_pct = 0 }
+    /^[[:space:]]*#?[[:space:]]*ALGO=/ {
+      if (!saw_algo) { print "ALGO=zstd"; saw_algo = 1 }
+      next
+    }
+    /^[[:space:]]*#?[[:space:]]*PERCENT=/ {
+      if (!saw_pct) { print "PERCENT=25"; saw_pct = 1 }
+      next
+    }
+    { print }
+    END {
+      if (!saw_algo) print "ALGO=zstd"
+      if (!saw_pct) print "PERCENT=25"
+    }
+  ' "$file" > "$tmp"
+  mv "$tmp" "$file"
+}
+
+main() {
+  configure_zramswap /etc/default/zramswap
+  systemctl enable vdtos-report.service
+  sysctl --system || true
+}
+
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then main "$@"; fi
