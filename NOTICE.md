@@ -20,7 +20,7 @@ Văn bản giấy phép đầy đủ của từng gói nằm trong ISO, ở `/us
 | Font Noto | Gói `fonts-noto-core` | SIL Open Font License 1.1 | |
 | Debian Installer, logo Debian | Debian | GPL / Debian Open Use Logo License | |
 | `intel-microcode` | Kho `non-free-firmware` | Giấy phép riêng của Intel: **không phải mã nguồn mở**, cho phép phân phối lại nguyên bản | |
-| `firmware-misc-nonfree`, `firmware-realtek`, `firmware-iwlwifi` | Kho `non-free-firmware` | Giấy phép riêng của từng hãng: **không phải mã nguồn mở**, cho phép phân phối lại nguyên bản | Cần cho Wi-Fi, mạng và GPU trên máy thật |
+| `firmware-misc-nonfree`, `firmware-realtek`, `firmware-iwlwifi`, `firmware-atheros`, `firmware-brcm80211`, `firmware-libertas`, `firmware-mediatek` | Kho `non-free-firmware` | Giấy phép riêng của từng hãng: **không phải mã nguồn mở**, cho phép phân phối lại nguyên bản | Cần cho Wi-Fi, mạng và GPU trên máy thật |
 
 Các firmware non-free được phép phân phối lại đúng như Debian đang làm trong ảnh cài đặt chính thức, với điều kiện
 giữ nguyên file và kèm giấy phép (đã có trong `/usr/share/doc/<gói>/copyright`). Không được sửa đổi hay dịch ngược chúng.
