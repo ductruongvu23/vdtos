@@ -60,7 +60,7 @@ if grep -qF "./etc/default/zramswap" <<< "$contents"; then
 fi
 
 assert_eq "0.2.0" "$(dpkg-deb -f "$base_deb" Version)" "vdtos-base Version"
-assert_eq "linux-image-vdtos, zram-tools, orchis-gtk-theme, papirus-icon-theme, fonts-inter, fonts-jetbrains-mono, xfce4-whiskermenu-plugin, xfce4-docklike-plugin, xfce4-power-manager-plugins, xfce4-pulseaudio-plugin, librsvg2-common" "$(dpkg-deb -f "$base_deb" Depends)" "vdtos-base Depends"
+assert_eq "linux-image-vdtos, zram-tools, orchis-gtk-theme, papirus-icon-theme, fonts-inter, fonts-jetbrains-mono, xfce4-whiskermenu-plugin, xfce4-docklike-plugin, xfce4-power-manager-plugins, xfce4-pulseaudio-plugin, librsvg2-common, wine, wine64, fonts-wine, fonts-liberation, libgl1, libgl1-mesa-dri, libasound2-plugins, gstreamer1.0-plugins-good, python3-gi, gir1.2-gtk-3.0, xdg-utils" "$(dpkg-deb -f "$base_deb" Depends)" "vdtos-base Depends"
 assert_eq "6.18.65" "$(dpkg-deb -f "$meta_deb" Version)" "linux-image-vdtos Version"
 assert_eq "linux-image-6.18.65-vdtos" "$(dpkg-deb -f "$meta_deb" Depends)" "linux-image-vdtos Depends"
 

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Run Windows Application (Wine)
+Exec=vdtos-wine run %f
+Icon=wine
+NoDisplay=true
+StartupNotify=true
+MimeType=application/x-ms-dos-executable;application/x-msi;application/x-ms-shortcut;

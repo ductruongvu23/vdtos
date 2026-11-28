@@ -1,0 +1,46 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_CURRENT_USER\Control Panel\Colors]
+"ActiveBorder"="56 56 56"
+"ActiveTitle"="33 33 33"
+"AppWorkSpace"="24 24 24"
+"Background"="15 23 42"
+"ButtonAlternativeFace"="44 44 44"
+"ButtonDkShadow"="18 18 18"
+"ButtonFace"="44 44 44"
+"ButtonHilight"="66 66 66"
+"ButtonLight"="56 56 56"
+"ButtonShadow"="24 24 24"
+"ButtonText"="224 224 224"
+"GradientActiveTitle"="33 33 33"
+"GradientInactiveTitle"="28 28 28"
+"GrayText"="130 130 130"
+"Hilight"="30 136 229"
+"HilightText"="255 255 255"
+"HotTrackingColor"="56 189 248"
+"InactiveBorder"="44 44 44"
+"InactiveTitle"="28 28 28"
+"InactiveTitleText"="160 160 160"
+"InfoText"="224 224 224"
+"InfoWindow"="44 44 44"
+"Menu"="44 44 44"
+"MenuBar"="38 38 38"
+"MenuHilight"="30 136 229"
+"MenuText"="224 224 224"
+"Scrollbar"="38 38 38"
+"TitleText"="224 224 224"
+"Window"="33 33 33"
+"WindowFrame"="56 56 56"
+"WindowText"="224 224 224"
+
+[HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\FontSubstitutes]
+"MS Shell Dlg"="Inter"
+"MS Shell Dlg 2"="Inter"
+"Tahoma"="Inter"
+"Segoe UI"="Inter"
+
+[HKEY_CURRENT_USER\Software\Wine\X11 Driver]
+"Decorated"="Y"
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ThemeManager]
+"ThemeActive"="0"
