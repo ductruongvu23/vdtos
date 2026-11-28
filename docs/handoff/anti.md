@@ -30,4 +30,18 @@ Claude là người điều phối. Mỗi khi bạn xong việc hoặc được 
 4. Làm trong thư mục riêng của mình (Anti: `C:\Users\VDT\Documents\New_os`, Codex: `C:\Users\VDT\Documents\New_os-codex` qua `git worktree`), không đổi branch trong thư mục của agent kia.
 
 ## Việc hiện tại
-Chờ. Task 7 (kho apt, PR #28) và Task 8 (giao diện, PR #37) đã gộp.
+**Sửa bản live không có tài khoản và hình nền SVG không hiện** (branch `anti/live-user`, tạo từ `main`).
+Ảnh chụp ISO v0.2.0 trong QEMU: LightDM hiện màn hình đăng nhập thay vì tự vào desktop. Đăng nhập bằng `user` / `live`
+thì bị báo sai mật khẩu. Nền màn hình đăng nhập đen, không có `default.svg`.
+Nguyên nhân: ISO build với `--apt-recommends false`, nên thiếu hai gói vốn chỉ là Recommends:
+- `user-setup`: `live-config` cần gói này để tạo tài khoản live và bật tự đăng nhập cho LightDM.
+- `librsvg2-common`: loader SVG cho gdk-pixbuf; thiếu gói này thì greeter và xfdesktop không vẽ được hình nền `.svg`.
+
+Việc cần làm:
+- Thêm `user-setup` vào `live/config/package-lists/desktop.list.chroot`, cùng dòng với `live-config`.
+- Thêm `librsvg2-common` vào `live/config/package-lists/ui.list.chroot`, và vào `Depends` của `vdtos-base` trong
+  `packaging/build-debs.sh` (máy đã cài cũng cần gói này để hiện hình nền khi `apt full-upgrade`).
+- Test: `tests/test_packaging.sh` kiểm `Depends` có `librsvg2-common`; `test_packages.sh` sẵn có sẽ kiểm hai tên gói có trong trixie.
+- Không sửa `--apt-recommends false`, không sửa `.github/workflows`, `Makefile`, `tests/smoke.sh`.
+
+Push xong là xong; `unit`, `iso`, `smoke` phải xanh. Claude sẽ tự chạy ISO trong QEMU để xem có vào thẳng desktop không.
